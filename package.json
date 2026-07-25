@@ -1,0 +1,31 @@
+{
+  "name": "colin-place",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "snapshot:automations": "node scripts/export-automation-status.mjs",
+    "publish:findings": "node scripts/publish-agent-findings.mjs",
+    "build": "npm run snapshot:automations && next build",
+    "start": "next start",
+    "lint": "eslint"
+  },
+  "dependencies": {
+    "framer-motion": "^12.42.2",
+    "lucide-react": "^1.24.0",
+    "next": "16.2.10",
+    "playwright": "^1.61.1",
+    "react": "19.2.4",
+    "react-dom": "19.2.4"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "16.2.10",
+    "tailwindcss": "^4",
+    "typescript": "^5"
+  }
+}
