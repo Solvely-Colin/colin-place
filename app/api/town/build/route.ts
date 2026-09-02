@@ -62,5 +62,5 @@ export async function POST(req: NextRequest) {
 
   const stored = storeConfigured() ? await pushBuilding("pending", building) : false;
 
-  return NextResponse.json({ building, stored, ms: gen.ms });
+  return NextResponse.json({ building, stored, ms: gen.ms, reason: gen.reason });
 }

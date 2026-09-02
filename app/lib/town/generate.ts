@@ -20,6 +20,8 @@ export interface GenerateResult {
   source: "model" | "blueprint";
   model?: string;
   ms: number;
+  /** Why the blueprint was used instead of the model, when it was. */
+  reason?: string;
 }
 
 async function callOllama(description: string): Promise<{ spec: BuildingSpec; model: string }> {
@@ -91,13 +93,15 @@ export function blueprint(description: string): BuildingSpec {
 
 export async function generateBuilding(description: string): Promise<GenerateResult> {
   const t0 = Date.now();
+  let reason = "no model key";
   if (ollamaReady()) {
     try {
       const { spec, model } = await callOllama(description);
       return { spec, source: "model", model, ms: Date.now() - t0 };
     } catch (err) {
-      console.error("[town] generation failed, using blueprint:", err instanceof Error ? err.message : err);
+      reason = err instanceof Error ? err.message : String(err);
+      console.error("[town] generation failed, using blueprint:", reason);
     }
   }
-  return { spec: blueprint(description), source: "blueprint", ms: Date.now() - t0 };
+  return { spec: blueprint(description), source: "blueprint", ms: Date.now() - t0, reason: reason.slice(0, 300) };
 }
