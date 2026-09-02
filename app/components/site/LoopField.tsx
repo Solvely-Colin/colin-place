@@ -43,6 +43,7 @@ const KIND_LABEL: Record<string, string> = {
 };
 
 interface Particle {
+  fall: number; // 0 riding the loop; >0 crumbling: seconds fallen
   t: number;
   speed: number;
   off: number;
@@ -100,6 +101,7 @@ export function LoopField({ events }: { events: FeedItem[] }) {
       const next: Particle[] = [];
       for (let i = 0; i < ambientCount; i += 1) {
         next.push({
+          fall: 0,
           t: Math.random() * TAU,
           speed: rand(0.0018, 0.0046),
           off: rand(-1, 1),
@@ -117,6 +119,7 @@ export function LoopField({ events }: { events: FeedItem[] }) {
       const evs = events.slice(0, mobile ? 14 : 28);
       evs.forEach((event, i) => {
         next.push({
+          fall: 0,
           t: (i / evs.length) * TAU + rand(-0.05, 0.05),
           speed: rand(0.0009, 0.0016),
           off: rand(-0.7, 0.7),
@@ -166,14 +169,37 @@ export function LoopField({ events }: { events: FeedItem[] }) {
       // Past the middle of the fall, the loop stands up: a second lemniscate
       // turned on its side, and particles drift between the two.
       const blend = Math.max(0, Math.min(1, (dread - 0.45) / 0.4)) * (0.35 + 0.65 * ((p.phase / TAU) % 1));
-      const bx = base.x * (1 - blend) + -base.y * 2.6 * blend;
-      const by = base.y * (1 - blend) + base.x * 0.55 * blend;
+      let bx = base.x * (1 - blend) + -base.y * 2.6 * blend;
+      let by = base.y * (1 - blend) + base.x * 0.55 * blend;
+      // R'lyeh: past band 3 the loop stops closing. One arc is displaced,
+      // so the figure never meets itself.
+      if (dread > 0.55) {
+        const gap = ((p.t + time * 0.2) % TAU) / TAU;
+        if (gap > 0.62 && gap < 0.8) {
+          const k = (dread - 0.55) * 2.2;
+          bx += 60 * k;
+          by -= 40 * k;
+        }
+      }
       p.x = cx + bx + nx * o + p.dx;
       p.y = cy + by + ny * o + p.dy;
+      // The Colour: lights crumble to grey dust and fall.
+      if (p.fall > 0) {
+        p.y += p.fall * p.fall * 30;
+        p.x += Math.sin(p.fall * 6 + p.phase) * 4;
+      }
     }
 
     function dot(p: Particle, boost = 1) {
       let [r, g, b] = p.rgb;
+      if (p.fall > 0) {
+        // Grey and brittle.
+        const k = Math.min(1, p.fall * 1.4);
+        r = Math.round(r + (120 - r) * k);
+        g = Math.round(g + (120 - g) * k);
+        b = Math.round(b + (116 - b) * k);
+        boost *= 1 - p.fall / 1.6;
+      }
       if (dread > 0.5) {
         const k = (dread - 0.5) * 2;
         r = Math.round(r + (82 - r) * k);
@@ -252,9 +278,15 @@ export function LoopField({ events }: { events: FeedItem[] }) {
       const current = hoverRef.current;
       let currentP: Particle | null = null;
 
+      const crumble = Math.max(0, (dread - 0.32) * 1.5);
       for (const p of particles) {
         p.t += p.speed * dt;
         if (p.t > TAU) p.t -= TAU;
+        if (crumble > 0 && p.fall === 0 && Math.random() < 0.004 * crumble * dt) p.fall = 0.01;
+        if (p.fall > 0) {
+          p.fall += dt * 0.016;
+          if (p.fall > 1.6) p.fall = 0;
+        }
         if (mouse.active) {
           const ddx = p.x - mouse.x;
           const ddy = p.y - mouse.y;
@@ -290,8 +322,11 @@ export function LoopField({ events }: { events: FeedItem[] }) {
         if (ddx * ddx + ddy * ddy < 90 * 90) hovered = currentP;
       }
 
+      const lights: { x: number; y: number }[] = [];
+      const rectTop = canvas!.getBoundingClientRect().top;
       for (const p of particles) {
         const isHover = hovered === p;
+        if (p.event && p.fall === 0) lights.push({ x: p.x, y: p.y + rectTop });
         dot(p, isHover ? 1.6 : 1);
         if (isHover) {
           const [r, g, b] = p.rgb;
@@ -303,6 +338,7 @@ export function LoopField({ events }: { events: FeedItem[] }) {
         }
       }
 
+      if (window.__wrongness) window.__wrongness.lights = lights;
       const nextId = hovered?.event?.id ?? null;
       if (nextId !== (hoverRef.current?.item.id ?? null)) {
         if (nextId && window.__wrongness) window.__wrongness.hovers += 1;

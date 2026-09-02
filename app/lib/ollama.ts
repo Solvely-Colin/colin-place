@@ -48,21 +48,60 @@ export function extractJson(content: string): unknown {
   }
 }
 
-// Models cut off mid-string or leave a trailing comma more often than they
-// should. Close what is open and drop what is broken, so a long reply still
-// yields the fields that made it.
+// Models cut off mid-string, leave trailing commas, and put raw quotes inside
+// strings more often than they should. Escape inner quotes, close what is
+// open, drop what is broken, so a long reply still yields its fields.
 export function repairJson(input: string): string {
-  let out = "";
-  const stack: string[] = [];
+  // Pass 1: escape double quotes that sit inside string values. A quote
+  // closes a string only if the next non-space character could follow a
+  // value or key: , } ] :
+  let fixed = "";
   let inString = false;
   let escaped = false;
-  for (const ch of input) {
+  for (let i = 0; i < input.length; i += 1) {
+    const ch = input[i];
+    if (inString) {
+      if (escaped) {
+        escaped = false;
+        fixed += ch;
+        continue;
+      }
+      if (ch === "\\") {
+        escaped = true;
+        fixed += ch;
+        continue;
+      }
+      if (ch === "\n") {
+        fixed += "\\n";
+        continue;
+      }
+      if (ch === '"') {
+        let j = i + 1;
+        while (j < input.length && (input[j] === " " || input[j] === "\n" || input[j] === "\r" || input[j] === "\t")) j += 1;
+        const next = input[j];
+        if (next === undefined || next === "," || next === "}" || next === "]" || next === ":") {
+          inString = false;
+          fixed += ch;
+        } else fixed += '\\"';
+        continue;
+      }
+      fixed += ch;
+      continue;
+    }
+    if (ch === '"') inString = true;
+    fixed += ch;
+  }
+  // Pass 2: close what is open.
+  let out = "";
+  const stack: string[] = [];
+  inString = false;
+  escaped = false;
+  for (const ch of fixed) {
     if (inString) {
       out += ch;
       if (escaped) escaped = false;
       else if (ch === "\\") escaped = true;
       else if (ch === '"') inString = false;
-      else if (ch === "\n") out = out.slice(0, -1) + "\\n";
       continue;
     }
     if (ch === '"') {
@@ -79,7 +118,6 @@ export function repairJson(input: string): string {
     } else out += ch;
   }
   if (inString) out += '"';
-  // Drop a dangling `"key":` or `"key": value-in-progress` fragment.
   out = out.replace(/,\s*"[^"]*"\s*:\s*("[^"]*")?\s*$/, "").replace(/,\s*$/, "");
   while (stack.length > 0) out += stack.pop();
   return out;

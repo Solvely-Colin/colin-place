@@ -195,9 +195,12 @@ html[data-band] body {
 html {
   --wr-dx: 0px; --wr-dy: 0px; --wr-scale: 1; --wr-rot: 0deg; --wr-hue: 0deg; --wr-spacing: 0em; --wr-invert: 0;
 }
+html {
+  --wr-sat: 1; --wr-blackout: 0;
+}
 html[data-band="2"] main, html[data-band="3"] main, html[data-band="4"] main {
   transform: translate(var(--wr-dx), var(--wr-dy)) scale(var(--wr-scale)) rotate(var(--wr-rot));
-  filter: hue-rotate(var(--wr-hue)) invert(var(--wr-invert));
+  filter: hue-rotate(var(--wr-hue)) invert(var(--wr-invert)) saturate(var(--wr-sat));
   transform-origin: 50% 40%;
   will-change: transform, filter;
 }
@@ -211,7 +214,18 @@ html[data-band="3"] .nav-loop { animation: loop-turn 9s linear infinite; }
 html[data-band="4"] .nav-loop { animation: loop-turn 2.2s linear infinite reverse; }
 @keyframes loop-turn { to { transform: rotate(360deg); } }
 
-/* Band 3: cold, green, tilted. */
+/* Band 2: the Colour's aftermath. Grey, brittle. */
+html[data-band="2"] .portrait { filter: saturate(0.25) contrast(1.05); transition: filter 6s; }
+html[data-band="2"] .display { letter-spacing: -0.024em; }
+
+/* Band 3: the Witch House. Angles that disagree. */
+html[data-band="3"] section:nth-of-type(odd) .section-head { transform: perspective(700px) rotateY(3deg) skewY(-0.4deg); }
+html[data-band="3"] section:nth-of-type(even) .section-head { transform: perspective(700px) rotateY(-4deg) skewY(0.5deg); }
+html[data-band="3"] section:nth-of-type(odd) .spot { transform: perspective(900px) rotateX(1.5deg); }
+html[data-band="3"] section:nth-of-type(even) .spot { transform: perspective(900px) rotateX(-2deg) rotateY(1deg); }
+html[data-band="3"] .portrait { filter: saturate(0.5) contrast(1.1) hue-rotate(-25deg); transition: filter 4s; }
+
+/* Band 3 defaults (the model usually overrides the palette). */
 html[data-band="3"] {
   --color-ground: #e6ece8;
   --color-ground-2: #f0f4f1;
@@ -224,9 +238,7 @@ html[data-band="3"] {
   --color-loop: #0f8f5a;
 }
 html[data-band="3"] .marquee { animation-direction: reverse; animation-duration: 18s; }
-html[data-band="3"] .section-head { transform: skewY(-0.35deg); }
 html[data-band="3"] .display { letter-spacing: -0.02em; word-spacing: 0.08em; }
-html[data-band="3"] .portrait { filter: saturate(0.6) contrast(1.1) hue-rotate(20deg); transition: filter 4s; }
 html[data-band="3"] ::selection { background: #0c1512; color: #e6ece8; }
 
 /* Band 4: the abyss. */
@@ -250,7 +262,9 @@ html[data-band="4"] {
 html[data-band="4"] .section-head { transform: skewY(0.6deg); }
 html[data-band="4"] .display { letter-spacing: 0.02em; word-spacing: 0.2em; animation: breathe 6s ease-in-out infinite; }
 @keyframes breathe { 50% { letter-spacing: 0.045em; } }
-html[data-band="4"] .portrait { filter: grayscale(0.7) contrast(1.25) sepia(0.4) hue-rotate(95deg); transform: scale(1.04); transition: filter 6s, transform 20s; }
+html[data-band="4"] .portrait { filter: url(#innsmouth) grayscale(0.6) contrast(1.25) sepia(0.4) hue-rotate(95deg); transform: scale(1.04); transition: transform 20s; }
+html[data-band="4"] .section-head { transform: perspective(700px) rotateY(6deg) skewY(0.8deg); }
+html[data-band="4"] section:nth-of-type(even) .section-head { transform: perspective(700px) rotateY(-7deg) skewY(-0.9deg); }
 html[data-band="4"] .marquee { animation-direction: reverse; animation-duration: 6s; }
 html[data-band="4"] .eyebrow { letter-spacing: 0.22em; }
 html[data-band="4"] .live-dot { animation-duration: 0.35s; }

@@ -2,7 +2,15 @@
 
 import { useEffect, useState } from "react";
 
+const AEONS = ["a strange aeon ago", "before the stars were right", "when the city rose", "in March 1925", "an age ago, under the reef", "before the first commit"];
+
 function relative(iso: string, now: number): string {
+  const band = typeof window !== "undefined" ? window.__wrongness?.band ?? 0 : 0;
+  if (band >= 3) {
+    let h = 0;
+    for (let i = 0; i < iso.length; i += 1) h = (h * 31 + iso.charCodeAt(i)) >>> 0;
+    return AEONS[h % AEONS.length];
+  }
   const diff = Math.max(0, now - new Date(iso).getTime());
   const m = Math.floor(diff / 60000);
   if (m < 1) return "just now";
@@ -22,7 +30,7 @@ export function TimeAgo({ iso, className }: { iso: string; className?: string })
   useEffect(() => {
     const tick = () => setText(relative(iso, Date.now()));
     tick();
-    const id = setInterval(tick, 30000);
+    const id = setInterval(tick, 8000);
     return () => clearInterval(id);
   }, [iso]);
   return (
