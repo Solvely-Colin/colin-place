@@ -8,7 +8,11 @@
   --font-display: var(--font-sans), "Helvetica Neue", Arial, sans-serif;
   --font-sans: var(--font-sans), "Helvetica Neue", Arial, sans-serif;
   --font-mono: var(--font-mono), ui-monospace, "SF Mono", Menlo, monospace;
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+}
 
+/* Colours are real variables (not inlined) so the wrongness can bleed them. */
+@theme {
   --color-ground: #f6f6f3;
   --color-ground-2: #ffffff;
   --color-ground-3: #efefeb;
@@ -24,8 +28,6 @@
   --color-push: #2b45ff;
   --color-mint: #0e9f6e;
   --color-butter: #c98a00;
-
-  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 :root {
@@ -181,6 +183,84 @@ html.intro-seen .intro {
 }
 @media (prefers-reduced-motion: reduce) {
   .intro { display: none; }
+}
+
+/* ------------------------------------------------------------------ */
+/*  The wrongness. html[data-band] goes 0..4 as sanity falls.          */
+/* ------------------------------------------------------------------ */
+html[data-band] body {
+  transition: background-color 3s ease, color 3s ease;
+}
+/* The scene the model composes drives these. */
+html {
+  --wr-dx: 0px; --wr-dy: 0px; --wr-scale: 1; --wr-rot: 0deg; --wr-hue: 0deg; --wr-spacing: 0em; --wr-invert: 0;
+}
+html[data-band="2"] main, html[data-band="3"] main, html[data-band="4"] main {
+  transform: translate(var(--wr-dx), var(--wr-dy)) scale(var(--wr-scale)) rotate(var(--wr-rot));
+  filter: hue-rotate(var(--wr-hue)) invert(var(--wr-invert));
+  transform-origin: 50% 40%;
+  will-change: transform, filter;
+}
+html[data-band="3"] .display, html[data-band="4"] .display { letter-spacing: var(--wr-spacing); }
+html[data-band="1"] .live-dot { animation-duration: 3.1s; }
+html[data-band="2"] .live-dot { animation-duration: 0.6s; }
+html[data-band="2"] .marquee { animation-direction: reverse; }
+html[data-band="2"] .display { letter-spacing: -0.026em; }
+html[data-band="2"] .nav-loop { animation: loop-turn 60s linear infinite; }
+html[data-band="3"] .nav-loop { animation: loop-turn 9s linear infinite; }
+html[data-band="4"] .nav-loop { animation: loop-turn 2.2s linear infinite reverse; }
+@keyframes loop-turn { to { transform: rotate(360deg); } }
+
+/* Band 3: cold, green, tilted. */
+html[data-band="3"] {
+  --color-ground: #e6ece8;
+  --color-ground-2: #f0f4f1;
+  --color-ground-3: #dde5df;
+  --color-ink: #0c1512;
+  --color-ink-dim: #2f4a3f;
+  --color-ink-mute: #5c7a6c;
+  --color-line: #cfdbd3;
+  --color-line-strong: #a9bfb2;
+  --color-loop: #0f8f5a;
+}
+html[data-band="3"] .marquee { animation-direction: reverse; animation-duration: 18s; }
+html[data-band="3"] .section-head { transform: skewY(-0.35deg); }
+html[data-band="3"] .display { letter-spacing: -0.02em; word-spacing: 0.08em; }
+html[data-band="3"] .portrait { filter: saturate(0.6) contrast(1.1) hue-rotate(20deg); transition: filter 4s; }
+html[data-band="3"] ::selection { background: #0c1512; color: #e6ece8; }
+
+/* Band 4: the abyss. */
+html[data-band="4"] {
+  --color-ground: #05100c;
+  --color-ground-2: #081711;
+  --color-ground-3: #0b1e16;
+  --color-ink: #bfe3d0;
+  --color-ink-dim: #7fb79b;
+  --color-ink-mute: #4f8268;
+  --color-line: #12352a;
+  --color-line-strong: #1f5a44;
+  --color-loop: #52ff9a;
+  --color-loop-soft: #52ff9a;
+  --color-merge: #ff5cc8;
+  --color-push: #52ff9a;
+  --color-mint: #52ff9a;
+  --color-butter: #ffd166;
+  color-scheme: dark;
+}
+html[data-band="4"] .section-head { transform: skewY(0.6deg); }
+html[data-band="4"] .display { letter-spacing: 0.02em; word-spacing: 0.2em; animation: breathe 6s ease-in-out infinite; }
+@keyframes breathe { 50% { letter-spacing: 0.045em; } }
+html[data-band="4"] .portrait { filter: grayscale(0.7) contrast(1.25) sepia(0.4) hue-rotate(95deg); transform: scale(1.04); transition: filter 6s, transform 20s; }
+html[data-band="4"] .marquee { animation-direction: reverse; animation-duration: 6s; }
+html[data-band="4"] .eyebrow { letter-spacing: 0.22em; }
+html[data-band="4"] .live-dot { animation-duration: 0.35s; }
+html[data-band="4"] img.watcher { filter: hue-rotate(110deg) saturate(1.6) contrast(1.2) drop-shadow(0 0 18px rgba(82,255,154,0.45)); }
+html[data-band="4"] ::selection { background: #52ff9a; color: #05100c; }
+
+/* Scramble flicker on mutated text. */
+[data-mut].mutating { color: var(--color-ink-mute); }
+@media (prefers-reduced-motion: reduce) {
+  html[data-band] * { animation: none !important; transition: none !important; }
 }
 
 /* Scrollbar. */

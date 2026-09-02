@@ -20,7 +20,7 @@ export async function GET() {
   return NextResponse.json(state);
 }
 
-// POST: force a rewrite. Needs the admin token.
+// POST: force a rewrite. Needs the admin token (TOWN_ADMIN_TOKEN, kept under its old name).
 export async function POST(req: NextRequest) {
   const token = process.env.TOWN_ADMIN_TOKEN;
   if (!token || req.headers.get("authorization") !== "Bearer " + token) {

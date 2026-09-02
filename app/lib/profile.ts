@@ -28,9 +28,9 @@ export const NOW_ITEMS = [
       "HubSpot architecture, custom apps, and lifecycle automation across four franchise brands.",
   },
   {
-    title: "Building the Town",
-    detail: "Describe a building and the architect builds it on the next empty lot. New ideas go there first.",
-    href: "/town",
+    title: "Teaching this site to talk",
+    detail: "A model on the page reads his live GitHub, writes the About, explains his open PRs, and answers questions.",
+    href: "#about",
   },
 ];
 
@@ -173,7 +173,7 @@ export const JOURNEY: JourneyStop[] = [
     when: "Now",
     title: "Building a playground",
     org: "colin.place",
-    note: "Ideas get built here first: the town, an About the site writes itself, whatever is next.",
+    note: "Ideas get built here first: an About the site writes itself, a model that explains his PRs, whatever is next.",
   },
 ];
 

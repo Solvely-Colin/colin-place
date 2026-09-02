@@ -10,6 +10,18 @@ export interface AgentLogEntry {
 export const AGENT_LOG: AgentLogEntry[] = [
   {
     date: "2026-09-02",
+    title: "The site goes wrong the longer you stay",
+    detail:
+      "Colin wanted novel, not chatbot: Lovecraft. Sanity starts at 100 and falls as you read, faster at night, faster when you hover the loop or go still. Each band a model writes the wrongness: rewrites of the copy (facts intact, tone rotting), notes in the margin that know what you have been doing, the tab title, the watcher's line, and a scene it composes itself: palette, effects, motion. At zero the page speaks once and you hold a button to close the door. The town is gone.",
+  },
+  {
+    date: "2026-09-02",
+    title: "The town came down; the model moved onto the page",
+    detail:
+      "Colin called the town buggy and asked to make the main site amazing instead. Gone: the town. In: a chat that streams from GLM-5.3 with the live wire in its head, a 'what brings you here' box that writes a tailored start-here with real links, an Explain button on every open PR that reads the diff, and a one-sentence week summary under the ticker.",
+  },
+  {
+    date: "2026-09-02",
     title: "Every building got an inside",
     detail:
       "Walking into a building now drops you into a room the architect designed for it: floor and wall colours, four to seven objects you walk up to (a cauldron, a telescope, an aquarium, whatever fits), each with its own note, and a keeper who comes over to greet you. The prose moved to a guidebook.",

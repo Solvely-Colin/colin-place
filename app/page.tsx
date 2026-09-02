@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowDown, ArrowUpRight, Building2, GitFork, GitPullRequestDraft, Star } from "lucide-react";
+import { ArrowDown, ArrowUpRight, GitFork, GitPullRequestDraft, Star } from "lucide-react";
 import { after } from "next/server";
 import { fetchPulse } from "./lib/pulse";
 import { loadAbout, regenerateAbout } from "./lib/about";
+import { ollamaReady } from "./lib/ollama";
 import { fetchGithubActivity, type FeedItem } from "./lib/activity";
 import { fetchRepos, type RepoCard } from "./lib/repos";
 import { DROPS } from "./lib/drops";
@@ -24,13 +25,13 @@ import { LocalClock } from "./components/site/LocalClock";
 import { Presence } from "./components/site/Presence";
 import { TimeAgo } from "./components/site/TimeAgo";
 import { Journey } from "./components/site/Journey";
-import { Companion } from "./components/site/Companion";
+import { Wrongness } from "./components/site/Wrongness";
 
 export const revalidate = 600;
 
 export const metadata: Metadata = {
   description:
-    "Colin Johnson builds in the open: open-source maintainer, community builder, CRM architect by day. A playground site his agents build and deploy, with a town where described ideas become buildings.",
+    "Colin Johnson builds in the open: open-source maintainer, community builder, CRM architect by day. A playground site his agents build and deploy, where a model reads his live GitHub and talks back.",
 };
 
 const LANG_COLORS: Record<string, string> = {
@@ -82,6 +83,7 @@ export default async function Home() {
   const wireItems = allEvents.slice(0, 30);
   const aboutInputs = { pulse, events: allEvents, repos };
   const about = await loadAbout(aboutInputs);
+  const ready = ollamaReady();
   if (about.stale && about.canRewrite) {
     // Serve what we have now; rewrite after the response and it shows on the next visit.
     after(() => regenerateAbout(aboutInputs));
@@ -124,35 +126,34 @@ export default async function Home() {
 
             <Reveal delay={0.08}>
               <h1 className="display text-[clamp(2.8rem,8vw,7rem)] text-ink">
-                Hi, I&apos;m Colin.
+                <span data-mut="hero1">Hi, I&apos;m Colin.</span>
                 <br />
-                I build in the open.
+                <span data-mut="hero2">I build in the open.</span>
               </h1>
             </Reveal>
 
             <div className="grid lg:grid-cols-[minmax(0,1fr)_auto] items-end gap-8 mt-10">
               <Reveal delay={0.16}>
-                <p className="pointer-events-auto max-w-[48ch] text-ink-dim text-base sm:text-lg leading-relaxed">
+                <p className="pointer-events-auto max-w-[48ch] text-ink-dim text-base sm:text-lg leading-relaxed" data-mut="heroP">
                   I maintain open-source tools, help run a couple of developer communities, and
                   build CRM systems by day. This site is my playground: my agents plan, write, and
-                  deploy it, and the town is where new ideas get built first. Everything here links
-                  to something real.
+                  deploy it, and a model on the page reads my live GitHub and talks back. Everything
+                  here links to something real.
                 </p>
               </Reveal>
               <Reveal delay={0.24} className="pointer-events-auto flex flex-wrap gap-3">
-                <Link
-                  href="/town"
-                  className="group inline-flex items-center gap-2 h-10 px-4 rounded-md bg-ink text-ground font-medium text-sm hover:bg-ink-dim transition"
-                >
-                  <Building2 className="w-4 h-4" />
-                  Walk the town
-                </Link>
                 <a
                   href="#about"
-                  className="group inline-flex items-center gap-2 h-10 px-4 rounded-md border border-line-strong bg-ground-2 text-ink text-sm font-medium hover:border-ink transition"
+                  className="group inline-flex items-center gap-2 h-10 px-4 rounded-md bg-ink text-ground font-medium text-sm hover:bg-ink-dim transition"
                 >
                   About me
                   <ArrowDown className="w-4 h-4 transition-transform group-hover:translate-y-0.5" />
+                </a>
+                <a
+                  href="#contact"
+                  className="inline-flex items-center gap-2 h-10 px-4 rounded-md border border-line-strong bg-ground-2 text-ink text-sm font-medium hover:border-ink transition"
+                >
+                  Say hi
                 </a>
               </Reveal>
             </div>
@@ -174,7 +175,7 @@ export default async function Home() {
               </div>
               <p className="font-mono text-[11px] text-ink-mute mt-8">
                 <span className="live-dot mr-2 align-middle" />
-                each light on the loop is a real event from Colin&apos;s public GitHub feed · hover one
+                <span data-mut="eyebrow">each light on the loop is a real event from Colin&apos;s public GitHub feed · hover one</span>
               </p>
             </Reveal>
           </div>
@@ -212,7 +213,7 @@ export default async function Home() {
                   width={900}
                   height={1200}
                   sizes="(min-width: 1024px) 40vw, 100vw"
-                  className="w-full h-full object-cover"
+                  className="portrait w-full h-full object-cover"
                 />
               </div>
               <p className="eyebrow mt-3">feeling loopy · the hat is real, so is the loop above</p>
@@ -409,6 +410,7 @@ export default async function Home() {
           index="04"
           kicker="About"
           title="About Colin, rewritten as he ships"
+          mutKey="about"
           blurb={
             <span className="font-mono text-[12px] leading-relaxed">
               {about.record.source === "model" ? (
@@ -447,36 +449,33 @@ export default async function Home() {
                 </div>
               </Reveal>
               {pulse.openPrs.length === 0 ? (
-                <p className="text-ink-dim">
-                  {pulse.ok ? "Nothing open. Inbox zero, PR edition." : "GitHub is not answering right now."}
-                </p>
+                <p className="text-ink-dim">{pulse.ok ? "Nothing open. Inbox zero, PR edition." : "GitHub is not answering right now."}</p>
               ) : (
-                <Stagger className="divide-y divide-line border-y border-line" gap={0.05}>
+                <div className="divide-y divide-line border-y border-line">
                   {pulse.openPrs.slice(0, 6).map((pr) => (
-                    <Item key={pr.url}>
-                      <a
-                        href={pr.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="group grid grid-cols-[auto_1fr_auto] items-start gap-4 py-3 hover:bg-ground-2 -mx-3 px-3 rounded-md transition"
-                      >
-                        <span className="font-mono text-[12px] text-ink-mute pt-0.5">#{pr.number}</span>
-                        <span className="min-w-0">
-                          <span className="block text-[15px] text-ink group-hover:text-loop transition leading-snug">{pr.title}</span>
-                          <span className="block font-mono text-[11px] text-ink-mute mt-1">
-                            {pr.repo}
-                            {pr.draft && (
-                              <span className="inline-flex items-center gap-1 ml-2 text-butter">
-                                <GitPullRequestDraft className="w-3 h-3" /> draft
-                              </span>
-                            )}
-                          </span>
+                    <a
+                      key={pr.url}
+                      href={pr.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="group grid grid-cols-[auto_1fr_auto] items-start gap-4 py-3 hover:bg-ground-2 -mx-3 px-3 rounded-md transition"
+                    >
+                      <span className="font-mono text-[12px] text-ink-mute pt-0.5">#{pr.number}</span>
+                      <span className="min-w-0">
+                        <span className="block text-[15px] text-ink group-hover:text-loop transition leading-snug">{pr.title}</span>
+                        <span className="block font-mono text-[11px] text-ink-mute mt-1">
+                          {pr.repo}
+                          {pr.draft && (
+                            <span className="inline-flex items-center gap-1 ml-2 text-butter">
+                              <GitPullRequestDraft className="w-3 h-3" /> draft
+                            </span>
+                          )}
                         </span>
-                        <TimeAgo iso={pr.updatedAt} className="font-mono text-[11px] text-ink-mute pt-0.5" />
-                      </a>
-                    </Item>
+                      </span>
+                      <TimeAgo iso={pr.updatedAt} className="font-mono text-[11px] text-ink-mute pt-0.5" />
+                    </a>
                   ))}
-                </Stagger>
+                </div>
               )}
 
               {about.record.narrative.highlights.length > 0 && (
@@ -531,9 +530,9 @@ export default async function Home() {
           <div className="relative mx-auto max-w-[1400px] px-5 sm:px-8">
             <Reveal>
               <p className="eyebrow mb-5">
-                <span className="text-loop">06</span> / Contact
+                <span className="text-loop" data-section-index="06">06</span> / Contact
               </p>
-              <h2 className="display text-[clamp(2.4rem,6vw,5rem)] text-ink">
+              <h2 className="display text-[clamp(2.4rem,6vw,5rem)] text-ink" data-mut="contact">
                 Let&apos;s build something.
               </h2>
             </Reveal>
@@ -544,7 +543,7 @@ export default async function Home() {
               >
                 hello@colin.place
               </a>
-              <p className="text-ink-dim mt-4 max-w-xl leading-relaxed">
+              <p className="text-ink-dim mt-4 max-w-xl leading-relaxed" data-mut="contactP">
                 Open-source, collaborations, interesting technical problems, or just to say hi.
                 He reads everything.
               </p>
@@ -569,30 +568,17 @@ export default async function Home() {
               ))}
             </Stagger>
 
-            <Reveal delay={0.1}>
-              <Link
-                href="/town"
-                className="spot group mt-6 flex items-center gap-5 p-6 rounded-lg border border-line bg-ground-2 hover:border-loop transition"
-              >
-                <Building2 className="w-8 h-8 text-loop shrink-0" />
-                <span className="min-w-0">
-                  <span className="block font-medium text-lg text-ink tracking-tight">This site also has a town.</span>
-                  <span className="block text-[14px] text-ink-dim mt-1">
-                    Every building is an idea. Walk around, walk in, and describe a new one: the architect
-                    builds it on the next empty lot while you watch.
-                  </span>
-                </span>
-                <ArrowUpRight className="w-5 h-5 ml-auto shrink-0 text-ink-mute group-hover:text-loop transition" />
-              </Link>
-            </Reveal>
           </div>
         </section>
 
         <footer className="border-t border-line">
           <div className="mx-auto max-w-[1400px] px-5 sm:px-8 py-10 grid sm:grid-cols-[1fr_auto] gap-6 items-end">
             <p className="text-[13px] text-ink-mute leading-relaxed max-w-xl">
-              Every pixel of this page, including this sentence, was planned, written, and deployed by
-              agent sessions, with Colin approving what ships. The latest of those deploys:{" "}
+              <span data-mut="footer">
+                Every pixel of this page, including this sentence, was planned, written, and deployed by
+                agent sessions, with Colin approving what ships.
+              </span>{" "}
+              The latest of those deploys:{" "}
               <span className="text-ink-dim">&ldquo;{lastDeploy.title}&rdquo;</span>.
             </p>
             <p className="font-mono text-[11px] text-ink-mute sm:text-right">
@@ -602,7 +588,7 @@ export default async function Home() {
         </footer>
       </main>
 
-      <Companion />
+      <Wrongness ready={ready} />
     </>
   );
 }

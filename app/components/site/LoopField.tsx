@@ -155,19 +155,32 @@ export function LoopField({ events }: { events: FeedItem[] }) {
       if (reduced) drawStatic();
     }
 
+    let dread = 0; // 0 sane .. 1 gone
     function place(p: Particle) {
       const base = lemniscate(p.t, a);
       const tan = lemniscateTangent(p.t, a);
       const nx = -tan.y;
       const ny = tan.x;
       const wob = Math.sin(time * p.wob + p.phase) * 0.3;
-      const o = (p.off + wob) * spread;
-      p.x = cx + base.x + nx * o + p.dx;
-      p.y = cy + base.y + ny * o + p.dy;
+      const o = (p.off + wob) * spread * (1 + dread * dread * 9);
+      // Past the middle of the fall, the loop stands up: a second lemniscate
+      // turned on its side, and particles drift between the two.
+      const blend = Math.max(0, Math.min(1, (dread - 0.45) / 0.4)) * (0.35 + 0.65 * ((p.phase / TAU) % 1));
+      const bx = base.x * (1 - blend) + -base.y * 2.6 * blend;
+      const by = base.y * (1 - blend) + base.x * 0.55 * blend;
+      p.x = cx + bx + nx * o + p.dx;
+      p.y = cy + by + ny * o + p.dy;
     }
 
     function dot(p: Particle, boost = 1) {
-      const [r, g, b] = p.rgb;
+      let [r, g, b] = p.rgb;
+      if (dread > 0.5) {
+        const k = (dread - 0.5) * 2;
+        r = Math.round(r + (82 - r) * k);
+        g = Math.round(g + (255 - g) * k);
+        b = Math.round(b + (154 - b) * k);
+      }
+      if (p.event && dread > 0.7) boost *= 0.55 + 0.45 * Math.sin(time * 40);
       if (p.event) {
         // Halo
         ctx!.fillStyle = `rgba(${r},${g},${b},${0.14 * boost})`;
@@ -183,9 +196,22 @@ export function LoopField({ events }: { events: FeedItem[] }) {
 
     function drawPath() {
       if (!path) return;
-      ctx!.strokeStyle = "rgba(43,69,255,0.14)";
-      ctx!.lineWidth = 1;
+      const g = Math.max(0, (dread - 0.5) * 2);
+      ctx!.strokeStyle = `rgba(${Math.round(43 + (82 - 43) * g)},${Math.round(69 + (255 - 69) * g)},${Math.round(255 + (154 - 255) * g)},${0.14 + dread * 0.2})`;
+      ctx!.lineWidth = 1 + dread * 1.5;
       ctx!.stroke(path);
+      if (dread > 0.45) {
+        // The standing loop, an eye.
+        ctx!.save();
+        ctx!.translate(cx, cy);
+        ctx!.rotate(Math.PI / 2);
+        ctx!.scale(0.55, 2.6);
+        ctx!.translate(-cx, -cy);
+        ctx!.strokeStyle = `rgba(82,255,154,${(dread - 0.45) * 0.5})`;
+        ctx!.lineWidth = 1;
+        ctx!.stroke(path);
+        ctx!.restore();
+      }
     }
 
     function drawStatic() {
@@ -209,6 +235,7 @@ export function LoopField({ events }: { events: FeedItem[] }) {
       const dt = Math.min((now - last) / 16.67, 3);
       last = now;
       time += dt * 0.016;
+      dread = 1 - Math.max(0, Math.min(100, window.__wrongness?.sanity ?? 100)) / 100;
 
       // Fade the previous frame: trails without an opaque canvas.
       ctx!.globalCompositeOperation = "destination-out";
@@ -278,6 +305,7 @@ export function LoopField({ events }: { events: FeedItem[] }) {
 
       const nextId = hovered?.event?.id ?? null;
       if (nextId !== (hoverRef.current?.item.id ?? null)) {
+        if (nextId && window.__wrongness) window.__wrongness.hovers += 1;
         hoverRef.current = hovered?.event ? { item: hovered.event } : null;
         setHover(hoverRef.current);
       }

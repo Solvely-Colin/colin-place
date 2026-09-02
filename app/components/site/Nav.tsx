@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { motion, useScroll, useSpring } from "framer-motion";
-import { Building2 } from "lucide-react";
 import { lemniscatePath } from "../../lib/loop";
 import { LocalClock } from "./LocalClock";
 
@@ -35,7 +34,7 @@ export function Nav() {
               stroke="currentColor"
               strokeWidth={1.8}
               strokeLinecap="round"
-              className="text-loop transition-transform duration-700 [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] group-hover:rotate-180 origin-center"
+              className="nav-loop text-loop transition-transform duration-700 [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] group-hover:rotate-180 origin-center"
             />
           </svg>
           <span className="font-medium tracking-tight">colin.place</span>
@@ -53,14 +52,7 @@ export function Nav() {
               {l.label}
             </a>
           ))}
-          <Link
-            href="/town"
-            className="ml-1 inline-flex items-center gap-1.5 h-8 px-3 rounded-md bg-ink text-ground text-[13px] font-medium hover:bg-ink-dim transition"
-            title="Walk the town"
-          >
-            <Building2 className="w-3.5 h-3.5" />
-            The Town
-          </Link>
+          <span id="sanity-readout" className="ml-2 font-mono text-[11px] text-ink-mute tabular-nums hidden" aria-live="off" />
         </nav>
       </div></div>
     </header>

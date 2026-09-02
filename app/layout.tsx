@@ -23,7 +23,7 @@ export const metadata: Metadata = {
     template: "%s · colin.place",
   },
   description:
-    "Open-source maintainer, community builder, CRM architect by day. A playground site his agents build and deploy, with a town where described ideas become buildings.",
+    "Open-source maintainer, community builder, CRM architect by day. A playground site his agents build and deploy, where a model reads his live GitHub and talks back.",
   openGraph: {
     type: "website",
     siteName: "colin.place",

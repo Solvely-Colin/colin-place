@@ -6,7 +6,7 @@ The home page is a light, precise single page: off-white paper, hairlines, Instr
 public GitHub events along an infinity loop (the "Feeling Loopy" hat, in commits);
 hover a light to see the event behind it. Below that: what he is doing now, numbers
 that link to their sources, the ecosystems he works in, open PRs as they stand,
-an About that the site rewrites itself, his open PRs, a career path, and contact.
+an About that the site rewrites itself, his open PRs, a career path, and contact. And it goes wrong the longer you stay.
 
 Every change to this site is planned, written, tested, and deployed by agent
 sessions, with Colin approving what ships. The agents append to
@@ -14,40 +14,39 @@ sessions, with Colin approving what ships. The agents append to
 
 ## The About that writes itself
 
-The About section is generated: a model reads Colin's live GitHub signals
-(recent events, open PRs, featured repos), writes a third-person narrative
-with links to real events, and the result is cached in Redis under a
-signature of those signals. When a PR, release, or repo lands, the signature
-moves, the page serves the last text and queues a rewrite after the response.
-`GET /api/about` shows the current state; `POST /api/about` with the admin
-token forces a rewrite. Without `OLLAMA_API_KEY` the hand-written fallback in
-`app/lib/profile.ts` is shown and labelled as such.
+The About section is generated: a model reads Colin's live GitHub signals, writes a
+third-person narrative with links to real events, and the result is cached in Redis
+under a signature of those signals. `GET /api/about` shows the state; `POST /api/about`
+with the admin token forces a rewrite.
 
-## The Town
+## The wrongness
 
-`/town` is a tiny isometric town where every building is an idea. Colin's projects
-are the first lots. Type a description and the architect writes a building spec
-as JSON (name, shape, floors, roof, palette, features, and an interior with rooms
-and a question) plus a walkable layout (room size, floor and wall colours, objects
-with notes, and a keeper); the engine draws it, a crane raises it on the next empty
-lot, and you walk in to a room you can move around in. Walk out the front to leave. `?hour=22` previews the town at another time of day.
+The site goes wrong the longer you stay. Sanity starts at 100 and falls (faster at
+night, when you hover the loop, when you go still, on return visits). Crossing each
+band asks `POST /api/whisper` for that band's wrongness, written by the model from
+coarse visitor facts and real GitHub events: rewrites of the page copy (facts stay
+true; only the tone rots), margin notes, the tab title, the watcher's line, and a
+scene the model composes (palette, an effect mix, motion values) that the abyss
+canvas and CSS render. At zero the page speaks once; hold the button to close the
+door and everything is restored. `?sanity=30` previews a band. "The site feels fine"
+(bottom-left, once it starts) turns it off for good; reduced-motion users never see it.
 
-Env vars:
+## Env vars
 
-- `OLLAMA_API_KEY` — an Ollama Cloud key (ollama.com/settings/keys). Without it
-  the architect falls back to a deterministic "blueprint" and says so.
+- `OLLAMA_API_KEY` — an Ollama Cloud key (ollama.com/settings/keys). Powers the
+  About and the wrongness.
 - `OLLAMA_MODEL` — defaults to `glm-5.3-flash:cloud`; `glm-5.3:cloud` for the full model.
-- `TOWN_ADMIN_TOKEN` — unlocks `/town/admin`, where visitor-built buildings wait
-  for approval before the whole town sees them. Needs the Upstash vars below.
+- `TOWN_ADMIN_TOKEN` — the admin token (name kept from an earlier feature). Forces
+  an About rewrite via `POST /api/about`.
+- `UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN` — caches for generated text and presence.
 
 ## Routes
 
 - `/` — the site
-- `/town` and `/town/admin` — the town, and its zoning office
-- `/api/town/build`, `/api/town/admin` — build a building; approve or reject one
 - `/apps/agent` — a public snapshot of the automation fleet
 - `/api/feed`, `/api/pulse`, `/api/repos` — live GitHub telemetry (cached 10–60 min)
-- `/api/ask` — the Clippy Colin chat (needs `OPENAI_API_KEY`)
+- `/api/about` — the self-writing About
+- `/api/whisper` — a band of wrongness for a visitor
 - `/api/presence` — shared presence (needs Upstash Redis env vars)
 
 ## Working on it
