@@ -1,0 +1,65 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&display=swap">
+  <style>
+    body { margin: 0; font-family: ui-sans-serif, system-ui, sans-serif; color: #2b2b2b; }
+    a { color: #2b2b2b; } a:hover { color: #000000; }
+    .hand { font-family: "Caveat", "Segoe Print", "Bradley Hand", cursive; }
+    .caret { display: inline-block; width: 2px; height: 34px; background: #2b2b2b; vertical-align: middle; animation: blink 1s steps(2) infinite; }
+    @keyframes blink { 50% { opacity: 0; } }
+  </style>
+</helmet>
+<div style="width: 1000px; height: 700px; background: #faf9f6; display: flex; flex-direction: column; overflow: hidden; box-sizing: border-box; border: 1px solid #d8d4cc;">
+  <div style="display: flex; align-items: center; justify-content: space-between; padding: 12px 20px; border-bottom: 1px dashed #b8b3a8; font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: #6b665d;">
+    <span>Direction A · Say it, then you're in it</span>
+    <span>desktop · low-fi</span>
+  </div>
+
+  <div style="position: relative; flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 22px; padding: 0 80px;">
+    <div style="position: absolute; top: 18px; left: 24px; font-size: 13px; color: #6b665d;">colin.place / playground</div>
+    <div style="position: absolute; top: 18px; right: 24px; display: flex; gap: 14px; font-size: 13px; color: #6b665d;">
+      <span>rooms</span><span>notes</span><span>who</span>
+    </div>
+
+    <div style="font-size: 15px; color: #6b665d; letter-spacing: 0.06em;">DESCRIBE A THING</div>
+    <div style="width: 760px; height: 84px; border: 2px solid #2b2b2b; border-radius: 8px; display: flex; align-items: center; padding: 0 26px; box-sizing: border-box; font-size: 30px; color: #9a958b; background: #ffffff; gap: 8px;">
+      <span>a machine that argues with itself</span><span class="caret"></span>
+    </div>
+    <div style="display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; max-width: 760px;">
+      <span style="border: 1px dashed #8a857b; border-radius: 999px; padding: 6px 14px; font-size: 13px; color: #6b665d;">one interview, one spec</span>
+      <span style="border: 1px dashed #8a857b; border-radius: 999px; padding: 6px 14px; font-size: 13px; color: #6b665d;">a browser agents can trust</span>
+      <span style="border: 1px dashed #8a857b; border-radius: 999px; padding: 6px 14px; font-size: 13px; color: #6b665d;">a site that narrates itself</span>
+      <span style="border: 1px dashed #8a857b; border-radius: 999px; padding: 6px 14px; font-size: 13px; color: #6b665d;">surprise me</span>
+    </div>
+
+    <div class="hand" style="position: absolute; right: 60px; top: 92px; width: 250px; font-size: 22px; line-height: 1.15; color: #2b2b2b; background: #fff3a3; padding: 10px 14px; transform: rotate(2deg);">
+      the whole homepage is one sentence box. type a thing → you're dropped into a room built for that idea. no menus first.
+    </div>
+
+    <div style="position: absolute; bottom: 22px; left: 80px; right: 80px; display: flex; flex-direction: column; gap: 10px;">
+      <div style="font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: #6b665d;">Recent rooms</div>
+      <div style="display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px;">
+        <div style="height: 70px; border: 1px solid #8a857b; border-radius: 6px; padding: 8px; font-size: 12px; color: #6b665d; background: #ffffff;">Quorum<br>three models, one vote</div>
+        <div style="height: 70px; border: 1px solid #8a857b; border-radius: 6px; padding: 8px; font-size: 12px; color: #6b665d; background: #ffffff;">SpecIt<br>interview → spec</div>
+        <div style="height: 70px; border: 1px solid #8a857b; border-radius: 6px; padding: 8px; font-size: 12px; color: #6b665d; background: #ffffff;">gsd-browser<br>evidence you can replay</div>
+        <div style="height: 70px; border: 1px solid #8a857b; border-radius: 6px; padding: 8px; font-size: 12px; color: #6b665d; background: #ffffff;">Colin OS<br>a desktop in a tab</div>
+        <div style="height: 70px; border: 1px dashed #8a857b; border-radius: 6px; padding: 8px; font-size: 12px; color: #9a958b;">+ whatever you type next</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="display: flex; gap: 28px; padding: 16px 20px; border-top: 1px dashed #b8b3a8; background: #f1eee7; font-size: 13px; line-height: 1.45;">
+    <div style="flex-grow: 1;"><strong>Why:</strong> the most literal answer to "describe it and dump me in". Navigation is a conversation, and every visitor makes a slightly different site.</div>
+    <div style="flex-grow: 1;"><strong>Tradeoff:</strong> it is only magic if something really generates the room. Without a live model behind it, it collapses into a fancy search box.</div>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

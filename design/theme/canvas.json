@@ -1,0 +1,64 @@
+{
+  "artboards": [
+    {
+      "file": "Main.dc.html",
+      "title": "A \u00b7 Precision",
+      "x": 0,
+      "y": 0,
+      "w": 1000,
+      "h": 1060,
+      "page": "page-1"
+    },
+    {
+      "file": "Poster.dc.html",
+      "title": "B \u00b7 Poster",
+      "x": 0,
+      "y": 0,
+      "w": 1000,
+      "h": 1060,
+      "page": "page-2"
+    },
+    {
+      "file": "Console.dc.html",
+      "title": "C \u00b7 Console",
+      "x": 1100,
+      "y": 0,
+      "w": 1000,
+      "h": 1060,
+      "page": "page-2"
+    },
+    {
+      "file": "Bloom.dc.html",
+      "title": "D \u00b7 Bloom",
+      "x": 2200,
+      "y": 0,
+      "w": 1000,
+      "h": 1060,
+      "page": "page-2"
+    }
+  ],
+  "annotations": [
+    {
+      "id": "chosen",
+      "page": "page-1",
+      "x": 0,
+      "y": -150,
+      "w": 560,
+      "text": "Chosen: A \u00b7 Precision. Applied to the live site and the town on 2026-09-02.\nThe other three directions are kept on the second page for reference."
+    }
+  ],
+  "launch": {
+    "view": "canvas",
+    "page": "page-1"
+  },
+  "pages": [
+    {
+      "id": "page-1",
+      "name": "Precision (chosen)"
+    },
+    {
+      "id": "page-2",
+      "name": "Unchosen directions"
+    }
+  ]
+}

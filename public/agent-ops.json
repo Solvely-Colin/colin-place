@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-07-25T12:55:37.872Z",
+  "generatedAt": "2026-07-30T18:44:02.046Z",
   "timezone": "America/Indiana/Indianapolis",
   "source": "OpenClaw scheduler · sanitized public snapshot",
   "scope": "OpenClaw mobile project operations",
@@ -15,190 +15,200 @@
     "requiresColin": "Worker dispatch, code changes, GitHub writes, signing, release, cleanup, and service changes"
   },
   "findings": {
-    "headline": "Host disk remains critically degraded; scheduled GitHub detection recovered and current main has no terminal mobile failure.",
+    "headline": "Exact main 7f7534253fc867eec97b947cfbfebbbf52016dfa has no mobile-scoped terminal failure; path-only PR #114631 is fully green with a maintainer API-contract decision remaining.",
     "overallStatus": "blocked",
     "observedRevision": {
-      "sha": "bdcc5d54a5dca1ae00d0e75eea031275182550d1",
+      "sha": "4dc90937a05a5fb12a398115979e6ed5c8ff58b9",
       "branch": "main",
-      "observedAt": "2026-07-25T12:19:09Z"
+      "observedAt": "2026-07-30T18:34:27.485Z"
     },
     "findings": [
       {
-        "id": "disk-build-floor:host:47.10gib-critical",
-        "severity": "critical",
-        "status": "updated",
-        "surface": "Project",
-        "summary": "Host free disk is a verified 39.84 GiB, still below the 50 GiB critical threshold and the 75 GiB mobile build floor. The critical incident remains active after its 30-minute repeat window; gateway connectivity is healthy and the shared build lock is free. Restore disk to at least 80 GiB and verify it remains there for two probes.",
-        "updatedAt": "2026-07-25T12:54:27.054Z",
-        "links": []
-      },
-      {
-        "id": "mobile-pr-merge-conflict:112000:89dad2e",
-        "severity": "medium",
-        "status": "resolved",
-        "surface": "Shared mobile",
-        "summary": "Draft shared-mobile PR #112000 advanced beyond conflicted head 89dad2ec7c034589b11f5d23e4f81ce2d6ea0e12 to replacement conflicted head a307ab6c17c77a41a0ed6013fd8e5311cde24c91.",
-        "updatedAt": "2026-07-25T12:19:09Z",
-        "links": [
-          {
-            "label": "PR #112000",
-            "url": "https://github.com/openclaw/openclaw/pull/112000"
-          },
-          {
-            "label": "Evidence",
-            "url": "https://github.com/openclaw/openclaw/commit/67ef07863fbb24d751e20f022e216118924ae15d"
-          },
-          {
-            "label": "Review evidence",
-            "url": "https://github.com/openclaw/openclaw/pull/112000#issuecomment-5078364743"
-          },
-          {
-            "label": "Review evidence",
-            "url": "https://github.com/openclaw/openclaw/pull/112000#issuecomment-5032412814"
-          }
-        ]
-      },
-      {
-        "id": "clawsweeper-mobile-decision:112000:89dad2e",
-        "severity": "medium",
-        "status": "resolved",
-        "surface": "Shared mobile",
-        "summary": "Draft shared-mobile PR #112000 advanced to exact head a307ab6c17c77a41a0ed6013fd8e5311cde24c91, superseding the ClawSweeper owner-decision packet tied to 89dad2ec7c034589b11f5d23e4f81ce2d6ea0e12; current-head re-review is pending.",
-        "updatedAt": "2026-07-25T12:19:09Z",
-        "links": [
-          {
-            "label": "PR #112000",
-            "url": "https://github.com/openclaw/openclaw/pull/112000"
-          },
-          {
-            "label": "Evidence",
-            "url": "https://github.com/openclaw/openclaw/commit/67ef07863fbb24d751e20f022e216118924ae15d"
-          },
-          {
-            "label": "Review evidence",
-            "url": "https://github.com/openclaw/openclaw/pull/112000#issuecomment-5078364743"
-          },
-          {
-            "label": "Review evidence",
-            "url": "https://github.com/openclaw/openclaw/pull/112000#issuecomment-5032412814"
-          }
-        ]
-      },
-      {
-        "id": "mobile-pr-merge-conflict:112000:a307ab6",
-        "severity": "medium",
-        "status": "updated",
-        "surface": "Shared mobile",
-        "summary": "Draft shared-mobile PR #112000 remains merge-conflicted on replacement exact head a307ab6c17c77a41a0ed6013fd8e5311cde24c91; its prior ClawSweeper decision is superseded and current-head re-review is pending.",
-        "updatedAt": "2026-07-25T12:19:09Z",
-        "links": [
-          {
-            "label": "PR #112000",
-            "url": "https://github.com/openclaw/openclaw/pull/112000"
-          },
-          {
-            "label": "Evidence",
-            "url": "https://github.com/openclaw/openclaw/commit/67ef07863fbb24d751e20f022e216118924ae15d"
-          },
-          {
-            "label": "Review evidence",
-            "url": "https://github.com/openclaw/openclaw/pull/112000#issuecomment-5078364743"
-          },
-          {
-            "label": "Review evidence",
-            "url": "https://github.com/openclaw/openclaw/pull/112000#issuecomment-5032412814"
-          }
-        ]
-      },
-      {
-        "id": "mobile-pr-merge-conflict:112000:e3c9064",
-        "severity": "medium",
-        "status": "resolved",
-        "surface": "Shared mobile",
-        "summary": "Draft shared-mobile PR #112000 advanced beyond merge-conflicted head e3c9064263a256635822ea96f910848123095750, superseding that revision-keyed event.",
-        "updatedAt": "2026-07-25T11:08:39.885Z",
-        "links": [
-          {
-            "label": "PR #112000",
-            "url": "https://github.com/openclaw/openclaw/pull/112000"
-          },
-          {
-            "label": "Evidence",
-            "url": "https://github.com/openclaw/openclaw/commit/67ef07863fbb24d751e20f022e216118924ae15d"
-          },
-          {
-            "label": "Review evidence",
-            "url": "https://github.com/openclaw/openclaw/pull/112000#issuecomment-5078364743"
-          },
-          {
-            "label": "Review evidence",
-            "url": "https://github.com/openclaw/openclaw/pull/112000#issuecomment-5032412814"
-          }
-        ]
-      },
-      {
-        "id": "clawsweeper-mobile-blocked:112863:337a8aa",
-        "severity": "high",
-        "status": "resolved",
-        "surface": "Android + iOS/iPadOS",
-        "summary": "Draft Android/iOS PR #112863 advanced to exact head e826f281ce834778dd148043fd65977d334d6c39, superseding the proof blocker tied to head 337a8aa7f75b8fde964d5c170ba80e85d5810991; current-head ClawSweeper marks it ready for maintainer review.",
-        "updatedAt": "2026-07-25T11:08:39.885Z",
-        "links": [
-          {
-            "label": "PR #112863",
-            "url": "https://github.com/openclaw/openclaw/pull/112863"
-          },
-          {
-            "label": "Review evidence",
-            "url": "https://github.com/openclaw/openclaw/pull/112863#issuecomment-5076692617"
-          }
-        ]
-      },
-      {
-        "id": "clawsweeper-mobile-decision:112863:e826f28",
+        "id": "clawsweeper-mobile-review:114631:dc0f6cd",
         "severity": "medium",
         "status": "firing",
-        "surface": "Android + iOS/iPadOS",
-        "summary": "ClawSweeper reviewed draft Android/iOS PR #112863 at exact head e826f281ce834778dd148043fd65977d334d6c39, found it ready for maintainer review, and requires an owner decision on the Signal setup and compatibility contract.",
-        "updatedAt": "2026-07-25T11:08:39.885Z",
+        "surface": "Shared mobile",
+        "summary": "ClawSweeper clears path-only shared-mobile PR #114631 for maintainer review at fully green exact head dc0f6cd0947fa74ab1aca5ff0198378347b62a38; maintainers must decide whether full WizardStep is the supported additive openclaw.chat client contract.",
+        "updatedAt": "2026-07-30T18:08:53.434Z",
         "links": [
           {
-            "label": "PR #112863",
-            "url": "https://github.com/openclaw/openclaw/pull/112863"
+            "label": "PR #114631",
+            "url": "https://github.com/openclaw/openclaw/pull/114631"
           },
           {
             "label": "Review evidence",
-            "url": "https://github.com/openclaw/openclaw/pull/112863#issuecomment-5076692617"
+            "url": "https://github.com/openclaw/openclaw/pull/114631#issuecomment-5093972738"
           }
         ]
       },
       {
-        "id": "github-detector-error:resolved-20260725T104506Z",
-        "severity": "critical",
+        "id": "clawsweeper-mobile-blocked:103052:resolved-closed-88bc426",
+        "severity": "high",
+        "status": "resolved",
+        "surface": "Android + Shared mobile",
+        "summary": "Android/shared PR #103052 closed unmerged at exact head 88bc4260cc9b8e749e029d3b29661a648f49cec6, resolving its high-severity ClawSweeper blocker.",
+        "updatedAt": "2026-07-30T17:10:27.576Z",
+        "links": [
+          {
+            "label": "PR #103052",
+            "url": "https://github.com/openclaw/openclaw/pull/103052"
+          },
+          {
+            "label": "Evidence",
+            "url": "https://github.com/openclaw/openclaw/commit/eb263c5104c300fb88a93f8453a79a0bb193b047"
+          },
+          {
+            "label": "Review evidence",
+            "url": "https://github.com/openclaw/openclaw/pull/103052#issuecomment-4928161237"
+          }
+        ]
+      },
+      {
+        "id": "clawsweeper-mobile-blocked:107744:e7e0614",
+        "severity": "high",
+        "status": "firing",
+        "surface": "Android",
+        "summary": "ClawSweeper blocks Android-labeled PR #107744 at exact head e7e0614cbd9c5061c6796c2c356116067245ee25 on an inactive public plugin permission/API contract, stale current-head behavior proof, and a required maintainer ownership decision.",
+        "updatedAt": "2026-07-30T14:23:41Z",
+        "links": [
+          {
+            "label": "PR #107744",
+            "url": "https://github.com/openclaw/openclaw/pull/107744"
+          },
+          {
+            "label": "Evidence",
+            "url": "https://github.com/openclaw/openclaw/compare/d8935248e4af3d8faa1aebc7ba57825a2b51cb8e...af70829cdf78bff46b9f8f87901baa47a06fd0d7"
+          },
+          {
+            "label": "Evidence",
+            "url": "https://github.com/openclaw/openclaw/commit/57f82408007485a6fd4db1f756fa2db45e605df8"
+          },
+          {
+            "label": "Evidence",
+            "url": "https://github.com/openclaw/openclaw/commit/0c36fabc612a2d501316bf18b277f1df5fe2011f"
+          }
+        ]
+      },
+      {
+        "id": "disk-build-floor:host:recovered-87.74gib",
+        "severity": "high",
         "status": "resolved",
         "surface": "Project",
-        "summary": "The scheduled GitHub detector recovered and emitted valid JSON; live follow-up verified exact main b8bb08a1ad37bddae5b7e5fdb2a0d8484ecfd92b with no terminal current-revision failure. Existing mobile PR blockers are unchanged.",
-        "updatedAt": "2026-07-25T10:48:43.939Z",
+        "summary": "Host disk pressure recovered: two consecutive read-only probes reported 86.85 GiB and 87.74 GiB free, both above the 80 GiB recovery threshold. Gateway 2026.7.2-beta.5 remains reachable and the shared mobile build lock is free.",
+        "updatedAt": "2026-07-30T13:53:40.975Z",
         "links": []
+      },
+      {
+        "id": "clawsweeper-mobile-blocked:112227:resolved-superseded-87f88fb",
+        "severity": "high",
+        "status": "resolved",
+        "surface": "Android",
+        "summary": "PR #112227 advanced to exact head 87f88fba28d0964f499493e2f1e3cd2a94a9eddc, where ClawSweeper verified unique contiguous position compaction, found no actionable patch defect, and cleared the prior P1 blocker for ordinary maintainer review.",
+        "updatedAt": "2026-07-30T13:11:53.300Z",
+        "links": [
+          {
+            "label": "PR #112227",
+            "url": "https://github.com/openclaw/openclaw/pull/112227"
+          },
+          {
+            "label": "PR #112227",
+            "url": "https://github.com/openclaw/openclaw/pull/112227/checks"
+          },
+          {
+            "label": "CI evidence",
+            "url": "https://github.com/openclaw/openclaw/actions/runs/30370769006/job/90313870994"
+          },
+          {
+            "label": "CI evidence",
+            "url": "https://github.com/openclaw/openclaw/actions/runs/30349766252/job/90249289403"
+          }
+        ]
+      },
+      {
+        "id": "clawsweeper-mobile-review:112227:faeab83",
+        "severity": "medium",
+        "status": "resolved",
+        "surface": "Android",
+        "summary": "PR #112227 advanced to replacement head 77f6a99090e3d9664d1573e3711acc94ad1b12a9 and completed fresh review, superseding the old-head review-start item.",
+        "updatedAt": "2026-07-30T12:12:15Z",
+        "links": [
+          {
+            "label": "PR #112227",
+            "url": "https://github.com/openclaw/openclaw/pull/112227"
+          },
+          {
+            "label": "PR #112227",
+            "url": "https://github.com/openclaw/openclaw/pull/112227/checks"
+          },
+          {
+            "label": "CI evidence",
+            "url": "https://github.com/openclaw/openclaw/actions/runs/30370769006/job/90313870994"
+          },
+          {
+            "label": "CI evidence",
+            "url": "https://github.com/openclaw/openclaw/actions/runs/30349766252/job/90249289403"
+          }
+        ]
+      },
+      {
+        "id": "clawsweeper-mobile-blocked:107805:4eb7529",
+        "severity": "high",
+        "status": "firing",
+        "surface": "Android",
+        "summary": "ClawSweeper blocks Android/shared PR #107805 at exact head 4eb752939576dc34170707d3e1000e2438835878 pending real coordination-session proof, conflict resolution, and a maintainer API/ownership decision.",
+        "updatedAt": "2026-07-30T12:12:15Z",
+        "links": [
+          {
+            "label": "PR #107805",
+            "url": "https://github.com/openclaw/openclaw/pull/107805"
+          },
+          {
+            "label": "Evidence",
+            "url": "https://github.com/openclaw/openclaw/commit/3e7ecb3aeaaf3a9dd4fa8c46c31b63c6f2031ccc"
+          },
+          {
+            "label": "Review evidence",
+            "url": "https://github.com/openclaw/openclaw/pull/107805#issuecomment-4986548444"
+          }
+        ]
+      },
+      {
+        "id": "clawsweeper-mobile-blocked:116330:resolved-21f0646",
+        "severity": "high",
+        "status": "resolved",
+        "surface": "Shared mobile",
+        "summary": "Path-only shared-mobile PR #116330 repaired its prior compatibility and proof blocker at replacement head 21f064601f963f8c609d39aef68780a95cfc44c8, received a no-actionable-defect ClawSweeper verdict, and merged as exact main 7fa95e2656aa46f519e8e685a9fc124de85a4dfc.",
+        "updatedAt": "2026-07-30T11:09:04.450Z",
+        "links": [
+          {
+            "label": "PR #116330",
+            "url": "https://github.com/openclaw/openclaw/pull/116330"
+          },
+          {
+            "label": "Review evidence",
+            "url": "https://github.com/openclaw/openclaw/pull/116330#issuecomment-5129127618"
+          }
+        ]
       }
     ],
     "topRisks": [
-      "Host free disk is 39.84 GiB, below the 50 GiB critical threshold and the 75 GiB mobile build floor.",
-      "Shared-mobile PR #113517 is ready for maintainer review at exact head 8dd9604bfaba9320d3742847fb940c6a538000c2, but its durable public plugin SDK and authorization boundary needs an owner decision before merge.",
-      "ClawSweeper blocks draft Android/iOS PR #112863 at exact head 337a8aa7f75b8fde964d5c170ba80e85d5810991 pending live Signal device-link and recovery proof, current-base compatibility and upgrade validation, and a maintainer product decision.",
-      "ClawSweeper blocks iOS/shared-mobile PR #113057 at exact head f764ebdb639d245ab60f3cbe4291a7e612299a06 pending real iOS proof that generated assistant images load after transcript/history reload.",
-      "ClawSweeper blocks iOS PR #113062 at exact head 861f073618f2abc012224c6bf64d4bff511b8710 pending inspectable simulator or device proof for the delayed-action and Voice Wake lifecycle repair."
+      "Android-labeled PR #107744 is blocked at exact head e7e0614cbd9c5061c6796c2c356116067245ee25 on an inactive public plugin permission/API contract, stale current-head behavior proof, dirty merge state, and a required maintainer ownership decision.",
+      "Android/shared PR #107805 is blocked at exact head 4eb752939576dc34170707d3e1000e2438835878 pending real coordination-session proof, resolution of its dirty merge state, and a maintainer API/ownership decision.",
+      "Android/shared PR #103648 is blocked at exact head 0f45550ee1bfa0ff7c0630442bab6723ad9e9a72 pending retry-safe transcript-injection identity, pre-first-turn sharing support, and real behavior proof.",
+      "iOS/shared PR #112589 is blocked at exact head e44db330dcf0ffe63a8fbe1abdbb82ac929b9772 because reserved spawns can expand the operator-configured target-agent allowlist; real Gateway proof and a Plugin SDK contract decision are also required.",
+      "Android overlay PR #116111 is blocked at exact head c56ffd697a2e9c2032639e142e7865250d981d9c: generic agent notifications can bypass Do Not Disturb and draw over unrelated unlocked apps without an explicit local consent and scope boundary."
     ],
     "nextActions": [
-      "Restore host free disk to at least 80 GiB without deleting project evidence or simulator state.",
-      "For PR #113517, accept or reject the proposed durable public plugin SDK and authorization boundary; ClawSweeper found no actionable patch defect at exact head 8dd9604bfaba9320d3742847fb940c6a538000c2.",
-      "For PR #112863, keep the draft open, rebase onto current main, provide redacted live Signal device-link and existing-server recovery proof plus fresh-install/upgrade and older-gateway compatibility validation, then obtain the maintainer product decision and request exact-head ClawSweeper re-review.",
-      "For PR #113057, provide inspectable after-fix iOS proof showing a generated assistant image loads through the active authenticated gateway after transcript/history reload, then request an exact-head ClawSweeper re-review.",
-      "For PR #113062, provide inspectable simulator or device proof covering the delayed-action and Voice Wake lifecycle behavior, then request an exact-head ClawSweeper re-review."
+      "For PR #107744, remove the dormant safetyEventTypes plugin permission and unused SDK facade or explicitly approve and fully wire the public contract, rebase onto current main, and attach redacted current-head Gateway proof.",
+      "For PR #112227, complete ordinary compatibility-aware maintainer review at exact head 87f88fba28d0964f499493e2f1e3cd2a94a9eddc while retaining the legacy sessions.groups.put fallback.",
+      "For PR #107805, resolve the dirty merge state, repair coordination-session creation, attach a redacted real MCP/Gateway send transcript, and obtain the public API/ownership decision.",
+      "For PR #103648, add a retry-safe transcript-injection identity, support sharing before the first agent turn, resolve merge conflicts, and attach current-head real behavior proof.",
+      "For PR #112589, preserve the configured target-agent allowlist as the upper-bound policy, add a focused regression test, attach accepted/rejected real Gateway proof, and obtain the Plugin SDK contract decision."
     ],
     "unknowns": [
+      "Complete older path-only shared-mobile PR coverage outside bounded live reconciliation.",
       "Real-device reproduction status for watchOS issue #105629.",
-      "Whether #111485 can be reproduced from an exact current iOS build and outbound payload."
+      "Clean local build result at main cc570a74532e4907e5f1f8090dd05fc7a1ddfc27; historical local builds remain separate."
     ]
   },
   "jobs": [
@@ -223,11 +233,44 @@
         "key": "running",
         "label": "Running now"
       },
-      "nextRunAt": "2026-07-25T12:54:00.000Z",
-      "lastActivityAt": "2026-07-25T12:44:16.430Z",
+      "nextRunAt": "2026-07-30T18:44:00.000Z",
+      "lastActivityAt": "2026-07-30T18:34:53.602Z",
       "lastActivityKind": "Agent run",
       "lastDelivery": "Quiet",
       "triggerEvaluations": null,
+      "never": [
+        "Dispatch coding workers",
+        "Edit project code",
+        "Push or update pull requests",
+        "Merge, sign, or release"
+      ]
+    },
+    {
+      "key": "github-signal",
+      "displayName": "Mobile CI watch",
+      "shortName": "GitHub",
+      "purpose": "Watches mobile pull-request checks and the default branch for current, actionable failures.",
+      "cadenceLabel": "Every 15 minutes",
+      "mode": "Headless detector",
+      "wakesModel": "Only after a material incident change",
+      "color": "indigo",
+      "can": [
+        "Read public GitHub state",
+        "Deduplicate failed revisions",
+        "Wake Mobile Clawd on change"
+      ],
+      "owner": "Mobile Clawd",
+      "schedule": "*/15 * * * *",
+      "timezone": "America/Indiana/Indianapolis",
+      "health": {
+        "key": "healthy",
+        "label": "On schedule"
+      },
+      "nextRunAt": "2026-07-30T18:45:00.000Z",
+      "lastActivityAt": "2026-07-30T18:34:51.495Z",
+      "lastActivityKind": "Detector check",
+      "lastDelivery": "Quiet",
+      "triggerEvaluations": 822,
       "never": [
         "Dispatch coding workers",
         "Edit project code",
@@ -256,44 +299,11 @@
         "key": "healthy",
         "label": "On schedule"
       },
-      "nextRunAt": "2026-07-25T12:58:00.000Z",
-      "lastActivityAt": "2026-07-25T12:55:27.072Z",
-      "lastActivityKind": "Detector check",
-      "lastDelivery": "Shared",
-      "triggerEvaluations": 921,
-      "never": [
-        "Dispatch coding workers",
-        "Edit project code",
-        "Push or update pull requests",
-        "Merge, sign, or release"
-      ]
-    },
-    {
-      "key": "github-signal",
-      "displayName": "Mobile CI watch",
-      "shortName": "GitHub",
-      "purpose": "Watches mobile pull-request checks and the default branch for current, actionable failures.",
-      "cadenceLabel": "Every 15 minutes",
-      "mode": "Headless detector",
-      "wakesModel": "Only after a material incident change",
-      "color": "indigo",
-      "can": [
-        "Read public GitHub state",
-        "Deduplicate failed revisions",
-        "Wake Mobile Clawd on change"
-      ],
-      "owner": "Mobile Clawd",
-      "schedule": "*/15 * * * *",
-      "timezone": "America/Indiana/Indianapolis",
-      "health": {
-        "key": "attention",
-        "label": "Needs attention"
-      },
-      "nextRunAt": "2026-07-25T13:00:00.000Z",
-      "lastActivityAt": "2026-07-25T12:45:10.168Z",
+      "nextRunAt": "2026-07-30T18:48:00.000Z",
+      "lastActivityAt": "2026-07-30T18:43:02.198Z",
       "lastActivityKind": "Detector check",
       "lastDelivery": "Quiet",
-      "triggerEvaluations": 363,
+      "triggerEvaluations": 1778,
       "never": [
         "Dispatch coding workers",
         "Edit project code",
@@ -322,8 +332,8 @@
         "key": "healthy",
         "label": "On schedule"
       },
-      "nextRunAt": "2026-07-25T13:07:00.000Z",
-      "lastActivityAt": "2026-07-25T12:13:00.586Z",
+      "nextRunAt": "2026-07-30T19:07:00.000Z",
+      "lastActivityAt": "2026-07-30T18:07:00.038Z",
       "lastActivityKind": "Agent run",
       "lastDelivery": "Shared",
       "triggerEvaluations": null,
@@ -352,13 +362,13 @@
       "schedule": "30 17 * * *",
       "timezone": "America/Indiana/Indianapolis",
       "health": {
-        "key": "healthy",
-        "label": "On schedule"
+        "key": "attention",
+        "label": "Needs attention"
       },
-      "nextRunAt": "2026-07-25T21:30:00.000Z",
-      "lastActivityAt": "2026-07-24T21:30:00.011Z",
+      "nextRunAt": "2026-07-30T21:30:00.000Z",
+      "lastActivityAt": "2026-07-29T21:30:00.039Z",
       "lastActivityKind": "Agent run",
-      "lastDelivery": "Shared",
+      "lastDelivery": "Quiet",
       "triggerEvaluations": null,
       "never": [
         "Dispatch coding workers",
@@ -388,8 +398,8 @@
         "key": "healthy",
         "label": "On schedule"
       },
-      "nextRunAt": "2026-07-26T13:00:00.000Z",
-      "lastActivityAt": "2026-07-21T01:02:29.964Z",
+      "nextRunAt": "2026-08-02T13:00:00.000Z",
+      "lastActivityAt": "2026-07-26T13:00:00.039Z",
       "lastActivityKind": "Agent run",
       "lastDelivery": "Shared",
       "triggerEvaluations": null,
@@ -403,483 +413,483 @@
   ],
   "upcoming": [
     {
-      "jobKey": "host-signal",
-      "shortName": "Host",
-      "at": "2026-07-25T12:58:00.000Z",
-      "color": "blue"
-    },
-    {
       "jobKey": "github-signal",
       "shortName": "GitHub",
-      "at": "2026-07-25T13:00:00.000Z",
+      "at": "2026-07-30T18:45:00.000Z",
       "color": "indigo"
     },
     {
       "jobKey": "host-signal",
       "shortName": "Host",
-      "at": "2026-07-25T13:03:00.000Z",
+      "at": "2026-07-30T18:48:00.000Z",
+      "color": "blue"
+    },
+    {
+      "jobKey": "host-signal",
+      "shortName": "Host",
+      "at": "2026-07-30T18:53:00.000Z",
       "color": "blue"
     },
     {
       "jobKey": "dashboard-publish",
       "shortName": "Publish",
-      "at": "2026-07-25T13:04:00.000Z",
+      "at": "2026-07-30T18:54:00.000Z",
+      "color": "blue"
+    },
+    {
+      "jobKey": "host-signal",
+      "shortName": "Host",
+      "at": "2026-07-30T18:58:00.000Z",
+      "color": "blue"
+    },
+    {
+      "jobKey": "github-signal",
+      "shortName": "GitHub",
+      "at": "2026-07-30T19:00:00.000Z",
+      "color": "indigo"
+    },
+    {
+      "jobKey": "host-signal",
+      "shortName": "Host",
+      "at": "2026-07-30T19:03:00.000Z",
+      "color": "blue"
+    },
+    {
+      "jobKey": "dashboard-publish",
+      "shortName": "Publish",
+      "at": "2026-07-30T19:04:00.000Z",
       "color": "blue"
     },
     {
       "jobKey": "state-refresh",
       "shortName": "State",
-      "at": "2026-07-25T13:07:00.000Z",
+      "at": "2026-07-30T19:07:00.000Z",
       "color": "amber"
     },
     {
       "jobKey": "host-signal",
       "shortName": "Host",
-      "at": "2026-07-25T13:08:00.000Z",
+      "at": "2026-07-30T19:08:00.000Z",
       "color": "blue"
     },
     {
       "jobKey": "host-signal",
       "shortName": "Host",
-      "at": "2026-07-25T13:13:00.000Z",
+      "at": "2026-07-30T19:13:00.000Z",
       "color": "blue"
     },
     {
       "jobKey": "dashboard-publish",
       "shortName": "Publish",
-      "at": "2026-07-25T13:14:00.000Z",
+      "at": "2026-07-30T19:14:00.000Z",
       "color": "blue"
     },
     {
       "jobKey": "github-signal",
       "shortName": "GitHub",
-      "at": "2026-07-25T13:15:00.000Z",
+      "at": "2026-07-30T19:15:00.000Z",
       "color": "indigo"
     },
     {
       "jobKey": "host-signal",
       "shortName": "Host",
-      "at": "2026-07-25T13:18:00.000Z",
+      "at": "2026-07-30T19:18:00.000Z",
       "color": "blue"
     },
     {
       "jobKey": "host-signal",
       "shortName": "Host",
-      "at": "2026-07-25T13:23:00.000Z",
+      "at": "2026-07-30T19:23:00.000Z",
       "color": "blue"
     },
     {
       "jobKey": "dashboard-publish",
       "shortName": "Publish",
-      "at": "2026-07-25T13:24:00.000Z",
+      "at": "2026-07-30T19:24:00.000Z",
       "color": "blue"
     },
     {
       "jobKey": "host-signal",
       "shortName": "Host",
-      "at": "2026-07-25T13:28:00.000Z",
+      "at": "2026-07-30T19:28:00.000Z",
       "color": "blue"
     },
     {
       "jobKey": "github-signal",
       "shortName": "GitHub",
-      "at": "2026-07-25T13:30:00.000Z",
+      "at": "2026-07-30T19:30:00.000Z",
       "color": "indigo"
     },
     {
       "jobKey": "host-signal",
       "shortName": "Host",
-      "at": "2026-07-25T13:33:00.000Z",
+      "at": "2026-07-30T19:33:00.000Z",
       "color": "blue"
     },
     {
       "jobKey": "dashboard-publish",
       "shortName": "Publish",
-      "at": "2026-07-25T13:34:00.000Z",
+      "at": "2026-07-30T19:34:00.000Z",
       "color": "blue"
     },
     {
       "jobKey": "host-signal",
       "shortName": "Host",
-      "at": "2026-07-25T13:38:00.000Z",
+      "at": "2026-07-30T19:38:00.000Z",
       "color": "blue"
     },
     {
       "jobKey": "host-signal",
       "shortName": "Host",
-      "at": "2026-07-25T13:43:00.000Z",
+      "at": "2026-07-30T19:43:00.000Z",
       "color": "blue"
     },
     {
       "jobKey": "dashboard-publish",
       "shortName": "Publish",
-      "at": "2026-07-25T13:44:00.000Z",
+      "at": "2026-07-30T19:44:00.000Z",
       "color": "blue"
     },
     {
       "jobKey": "github-signal",
       "shortName": "GitHub",
-      "at": "2026-07-25T13:45:00.000Z",
+      "at": "2026-07-30T19:45:00.000Z",
       "color": "indigo"
     },
     {
       "jobKey": "host-signal",
       "shortName": "Host",
-      "at": "2026-07-25T13:48:00.000Z",
+      "at": "2026-07-30T19:48:00.000Z",
       "color": "blue"
     },
     {
       "jobKey": "host-signal",
       "shortName": "Host",
-      "at": "2026-07-25T13:53:00.000Z",
+      "at": "2026-07-30T19:53:00.000Z",
       "color": "blue"
     },
     {
       "jobKey": "dashboard-publish",
       "shortName": "Publish",
-      "at": "2026-07-25T13:54:00.000Z",
+      "at": "2026-07-30T19:54:00.000Z",
       "color": "blue"
     },
     {
       "jobKey": "host-signal",
       "shortName": "Host",
-      "at": "2026-07-25T13:58:00.000Z",
+      "at": "2026-07-30T19:58:00.000Z",
       "color": "blue"
     },
     {
       "jobKey": "github-signal",
       "shortName": "GitHub",
-      "at": "2026-07-25T14:00:00.000Z",
+      "at": "2026-07-30T20:00:00.000Z",
       "color": "indigo"
     },
     {
       "jobKey": "host-signal",
       "shortName": "Host",
-      "at": "2026-07-25T14:03:00.000Z",
+      "at": "2026-07-30T20:03:00.000Z",
       "color": "blue"
     },
     {
       "jobKey": "dashboard-publish",
       "shortName": "Publish",
-      "at": "2026-07-25T14:04:00.000Z",
+      "at": "2026-07-30T20:04:00.000Z",
       "color": "blue"
     },
     {
       "jobKey": "state-refresh",
       "shortName": "State",
-      "at": "2026-07-25T14:07:00.000Z",
+      "at": "2026-07-30T20:07:00.000Z",
       "color": "amber"
     },
     {
       "jobKey": "host-signal",
       "shortName": "Host",
-      "at": "2026-07-25T14:08:00.000Z",
+      "at": "2026-07-30T20:08:00.000Z",
       "color": "blue"
     },
     {
       "jobKey": "host-signal",
       "shortName": "Host",
-      "at": "2026-07-25T14:13:00.000Z",
+      "at": "2026-07-30T20:13:00.000Z",
       "color": "blue"
     },
     {
       "jobKey": "dashboard-publish",
       "shortName": "Publish",
-      "at": "2026-07-25T14:14:00.000Z",
+      "at": "2026-07-30T20:14:00.000Z",
       "color": "blue"
     },
     {
       "jobKey": "github-signal",
       "shortName": "GitHub",
-      "at": "2026-07-25T14:15:00.000Z",
+      "at": "2026-07-30T20:15:00.000Z",
       "color": "indigo"
     },
     {
       "jobKey": "host-signal",
       "shortName": "Host",
-      "at": "2026-07-25T14:18:00.000Z",
+      "at": "2026-07-30T20:18:00.000Z",
       "color": "blue"
     },
     {
       "jobKey": "host-signal",
       "shortName": "Host",
-      "at": "2026-07-25T14:23:00.000Z",
+      "at": "2026-07-30T20:23:00.000Z",
       "color": "blue"
     },
     {
       "jobKey": "dashboard-publish",
       "shortName": "Publish",
-      "at": "2026-07-25T14:24:00.000Z",
+      "at": "2026-07-30T20:24:00.000Z",
       "color": "blue"
     },
     {
       "jobKey": "host-signal",
       "shortName": "Host",
-      "at": "2026-07-25T14:28:00.000Z",
+      "at": "2026-07-30T20:28:00.000Z",
       "color": "blue"
     },
     {
       "jobKey": "github-signal",
       "shortName": "GitHub",
-      "at": "2026-07-25T14:30:00.000Z",
+      "at": "2026-07-30T20:30:00.000Z",
       "color": "indigo"
     },
     {
       "jobKey": "host-signal",
       "shortName": "Host",
-      "at": "2026-07-25T14:33:00.000Z",
+      "at": "2026-07-30T20:33:00.000Z",
       "color": "blue"
     },
     {
       "jobKey": "dashboard-publish",
       "shortName": "Publish",
-      "at": "2026-07-25T14:34:00.000Z",
+      "at": "2026-07-30T20:34:00.000Z",
       "color": "blue"
     },
     {
       "jobKey": "host-signal",
       "shortName": "Host",
-      "at": "2026-07-25T14:38:00.000Z",
+      "at": "2026-07-30T20:38:00.000Z",
       "color": "blue"
     },
     {
       "jobKey": "host-signal",
       "shortName": "Host",
-      "at": "2026-07-25T14:43:00.000Z",
+      "at": "2026-07-30T20:43:00.000Z",
       "color": "blue"
     },
     {
       "jobKey": "dashboard-publish",
       "shortName": "Publish",
-      "at": "2026-07-25T14:44:00.000Z",
+      "at": "2026-07-30T20:44:00.000Z",
       "color": "blue"
     },
     {
       "jobKey": "github-signal",
       "shortName": "GitHub",
-      "at": "2026-07-25T14:45:00.000Z",
+      "at": "2026-07-30T20:45:00.000Z",
       "color": "indigo"
     },
     {
       "jobKey": "host-signal",
       "shortName": "Host",
-      "at": "2026-07-25T14:48:00.000Z",
+      "at": "2026-07-30T20:48:00.000Z",
       "color": "blue"
     },
     {
       "jobKey": "host-signal",
       "shortName": "Host",
-      "at": "2026-07-25T14:53:00.000Z",
+      "at": "2026-07-30T20:53:00.000Z",
       "color": "blue"
     },
     {
       "jobKey": "dashboard-publish",
       "shortName": "Publish",
-      "at": "2026-07-25T14:54:00.000Z",
+      "at": "2026-07-30T20:54:00.000Z",
       "color": "blue"
     },
     {
       "jobKey": "host-signal",
       "shortName": "Host",
-      "at": "2026-07-25T14:58:00.000Z",
+      "at": "2026-07-30T20:58:00.000Z",
       "color": "blue"
     },
     {
       "jobKey": "github-signal",
       "shortName": "GitHub",
-      "at": "2026-07-25T15:00:00.000Z",
+      "at": "2026-07-30T21:00:00.000Z",
       "color": "indigo"
     },
     {
       "jobKey": "host-signal",
       "shortName": "Host",
-      "at": "2026-07-25T15:03:00.000Z",
+      "at": "2026-07-30T21:03:00.000Z",
       "color": "blue"
     },
     {
       "jobKey": "dashboard-publish",
       "shortName": "Publish",
-      "at": "2026-07-25T15:04:00.000Z",
+      "at": "2026-07-30T21:04:00.000Z",
       "color": "blue"
     },
     {
       "jobKey": "state-refresh",
       "shortName": "State",
-      "at": "2026-07-25T15:07:00.000Z",
+      "at": "2026-07-30T21:07:00.000Z",
       "color": "amber"
     },
     {
       "jobKey": "host-signal",
       "shortName": "Host",
-      "at": "2026-07-25T15:08:00.000Z",
+      "at": "2026-07-30T21:08:00.000Z",
       "color": "blue"
     },
     {
       "jobKey": "host-signal",
       "shortName": "Host",
-      "at": "2026-07-25T15:13:00.000Z",
+      "at": "2026-07-30T21:13:00.000Z",
       "color": "blue"
     },
     {
       "jobKey": "dashboard-publish",
       "shortName": "Publish",
-      "at": "2026-07-25T15:14:00.000Z",
+      "at": "2026-07-30T21:14:00.000Z",
       "color": "blue"
     },
     {
       "jobKey": "github-signal",
       "shortName": "GitHub",
-      "at": "2026-07-25T15:15:00.000Z",
+      "at": "2026-07-30T21:15:00.000Z",
       "color": "indigo"
     },
     {
       "jobKey": "host-signal",
       "shortName": "Host",
-      "at": "2026-07-25T15:18:00.000Z",
+      "at": "2026-07-30T21:18:00.000Z",
       "color": "blue"
     },
     {
       "jobKey": "host-signal",
       "shortName": "Host",
-      "at": "2026-07-25T15:23:00.000Z",
+      "at": "2026-07-30T21:23:00.000Z",
       "color": "blue"
     },
     {
       "jobKey": "dashboard-publish",
       "shortName": "Publish",
-      "at": "2026-07-25T15:24:00.000Z",
+      "at": "2026-07-30T21:24:00.000Z",
       "color": "blue"
     },
     {
       "jobKey": "host-signal",
       "shortName": "Host",
-      "at": "2026-07-25T15:28:00.000Z",
+      "at": "2026-07-30T21:28:00.000Z",
       "color": "blue"
     },
     {
       "jobKey": "github-signal",
       "shortName": "GitHub",
-      "at": "2026-07-25T15:30:00.000Z",
+      "at": "2026-07-30T21:30:00.000Z",
       "color": "indigo"
     },
     {
+      "jobKey": "daily-digest",
+      "shortName": "Digest",
+      "at": "2026-07-30T21:30:00.000Z",
+      "color": "coral"
+    },
+    {
       "jobKey": "host-signal",
       "shortName": "Host",
-      "at": "2026-07-25T15:33:00.000Z",
+      "at": "2026-07-30T21:33:00.000Z",
       "color": "blue"
     },
     {
       "jobKey": "dashboard-publish",
       "shortName": "Publish",
-      "at": "2026-07-25T15:34:00.000Z",
+      "at": "2026-07-30T21:34:00.000Z",
       "color": "blue"
     },
     {
       "jobKey": "host-signal",
       "shortName": "Host",
-      "at": "2026-07-25T15:38:00.000Z",
+      "at": "2026-07-30T21:38:00.000Z",
       "color": "blue"
     },
     {
       "jobKey": "host-signal",
       "shortName": "Host",
-      "at": "2026-07-25T15:43:00.000Z",
+      "at": "2026-07-30T21:43:00.000Z",
       "color": "blue"
     },
     {
       "jobKey": "dashboard-publish",
       "shortName": "Publish",
-      "at": "2026-07-25T15:44:00.000Z",
+      "at": "2026-07-30T21:44:00.000Z",
       "color": "blue"
     },
     {
       "jobKey": "github-signal",
       "shortName": "GitHub",
-      "at": "2026-07-25T15:45:00.000Z",
+      "at": "2026-07-30T21:45:00.000Z",
       "color": "indigo"
     },
     {
       "jobKey": "host-signal",
       "shortName": "Host",
-      "at": "2026-07-25T15:48:00.000Z",
+      "at": "2026-07-30T21:48:00.000Z",
       "color": "blue"
     },
     {
       "jobKey": "host-signal",
       "shortName": "Host",
-      "at": "2026-07-25T15:53:00.000Z",
+      "at": "2026-07-30T21:53:00.000Z",
       "color": "blue"
     },
     {
       "jobKey": "dashboard-publish",
       "shortName": "Publish",
-      "at": "2026-07-25T15:54:00.000Z",
+      "at": "2026-07-30T21:54:00.000Z",
       "color": "blue"
     },
     {
       "jobKey": "host-signal",
       "shortName": "Host",
-      "at": "2026-07-25T15:58:00.000Z",
+      "at": "2026-07-30T21:58:00.000Z",
       "color": "blue"
     },
     {
       "jobKey": "github-signal",
       "shortName": "GitHub",
-      "at": "2026-07-25T16:00:00.000Z",
+      "at": "2026-07-30T22:00:00.000Z",
       "color": "indigo"
     },
     {
       "jobKey": "host-signal",
       "shortName": "Host",
-      "at": "2026-07-25T16:03:00.000Z",
+      "at": "2026-07-30T22:03:00.000Z",
       "color": "blue"
     },
     {
       "jobKey": "dashboard-publish",
       "shortName": "Publish",
-      "at": "2026-07-25T16:04:00.000Z",
+      "at": "2026-07-30T22:04:00.000Z",
       "color": "blue"
     },
     {
       "jobKey": "state-refresh",
       "shortName": "State",
-      "at": "2026-07-25T16:07:00.000Z",
+      "at": "2026-07-30T22:07:00.000Z",
       "color": "amber"
     },
     {
       "jobKey": "host-signal",
       "shortName": "Host",
-      "at": "2026-07-25T16:08:00.000Z",
-      "color": "blue"
-    },
-    {
-      "jobKey": "host-signal",
-      "shortName": "Host",
-      "at": "2026-07-25T16:13:00.000Z",
-      "color": "blue"
-    },
-    {
-      "jobKey": "dashboard-publish",
-      "shortName": "Publish",
-      "at": "2026-07-25T16:14:00.000Z",
-      "color": "blue"
-    },
-    {
-      "jobKey": "github-signal",
-      "shortName": "GitHub",
-      "at": "2026-07-25T16:15:00.000Z",
-      "color": "indigo"
-    },
-    {
-      "jobKey": "host-signal",
-      "shortName": "Host",
-      "at": "2026-07-25T16:18:00.000Z",
-      "color": "blue"
-    },
-    {
-      "jobKey": "host-signal",
-      "shortName": "Host",
-      "at": "2026-07-25T16:23:00.000Z",
+      "at": "2026-07-30T22:08:00.000Z",
       "color": "blue"
     }
   ]

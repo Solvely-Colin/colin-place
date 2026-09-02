@@ -1,0 +1,94 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=DM+Mono:wght@400;500&display=swap">
+  <style>
+    body { margin: 0; font-family: "Archivo", "Arial Narrow", Arial, sans-serif; color: #0a0a0a; -webkit-font-smoothing: antialiased; }
+    a { color: #0a0a0a; text-decoration: underline; } a:hover { color: #5b3cff; }
+    .mono { font-family: "DM Mono", "SF Mono", Menlo, monospace; }
+    .wide { font-variation-settings: "wdth" 125, "wght" 800; letter-spacing: -0.01em; text-transform: uppercase; }
+  </style>
+</helmet>
+<div style="width: 1000px; height: 1060px; background: {{ground}}; display: flex; flex-direction: column; overflow: hidden; box-sizing: border-box;">
+
+  <div style="display: flex; align-items: stretch; border-bottom: 3px solid #0a0a0a;">
+    <div style="flex-grow: 1; padding: 22px 28px; display: flex; flex-direction: column; gap: 10px;">
+      <div class="mono" style="font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase;">B · Poster</div>
+      <div class="wide" style="font-size: 30px; line-height: 1.0;">Archivo expanded + DM Mono</div>
+      <div style="font-size: 14px; max-width: 520px; line-height: 1.5;">One loud ground color, black ink, 3px rules, hard offset shadows. Flat everything. The mascot finally has a world that matches his energy.</div>
+    </div>
+    <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); width: 300px; border-left: 3px solid #0a0a0a;">
+      <div style="background: {{ground}};"></div>
+      <div style="background: #ffffff; border-left: 3px solid #0a0a0a;"></div>
+      <div style="background: #5b3cff; border-left: 3px solid #0a0a0a;"></div>
+      <div style="background: #0a0a0a;"></div>
+    </div>
+  </div>
+
+  <div style="display: flex; align-items: center; justify-content: space-between; height: 60px; padding: 0 28px; border-bottom: 3px solid #0a0a0a;">
+    <div class="wide" style="font-size: 18px;">colin.place</div>
+    <div style="display: flex; align-items: center; gap: 24px; font-size: 15px; font-weight: 600;">
+      <span>Work</span><span>Receipts</span><span>Town</span><span>Log</span>
+      <span style="display: inline-flex; align-items: center; height: 36px; padding: 0 14px; border: 3px solid #0a0a0a; background: #ffffff; box-shadow: 4px 4px 0 #0a0a0a; font-weight: 700;">Colin OS</span>
+    </div>
+  </div>
+
+  <div style="padding: 44px 28px 36px; display: flex; flex-direction: column; gap: 22px; border-bottom: 3px solid #0a0a0a;">
+    <div style="display: flex; gap: 8px;">
+      <span class="mono" style="font-size: 11px; padding: 6px 10px; border: 2px solid #0a0a0a; background: #ffffff; text-transform: uppercase; letter-spacing: 0.06em;">Colin Johnson</span>
+      <span class="mono" style="font-size: 11px; padding: 6px 10px; border: 2px solid #0a0a0a; background: #ffffff; text-transform: uppercase; letter-spacing: 0.06em;">Mishawaka, IN</span>
+      <span class="mono" style="font-size: 11px; padding: 6px 10px; border: 2px solid #0a0a0a; background: #5b3cff; color: #ffffff; text-transform: uppercase; letter-spacing: 0.06em;">Live</span>
+    </div>
+    <h1 class="wide" style="margin: 0; font-size: 84px; line-height: 0.9; text-wrap: balance;">Ships in<br>the open.<br>Keeps the<br>receipts.</h1>
+    <div style="display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 24px; align-items: end;">
+      <p style="grid-column: span 7; margin: 0; font-size: 17px; line-height: 1.5; font-weight: 500;">Open-source maintainer, developer-community builder, agent-tooling person. Built by his own agents, live from GitHub, every claim linked to a public page.</p>
+      <div style="grid-column: span 5; display: flex; gap: 12px; justify-content: flex-end;">
+        <span style="display: inline-flex; align-items: center; height: 48px; padding: 0 20px; border: 3px solid #0a0a0a; background: #0a0a0a; color: #ffffff; font-weight: 700; font-size: 15px; box-shadow: 5px 5px 0 #5b3cff;">See the receipts</span>
+        <span style="display: inline-flex; align-items: center; height: 48px; padding: 0 20px; border: 3px solid #0a0a0a; background: #ffffff; font-weight: 700; font-size: 15px; box-shadow: 5px 5px 0 #0a0a0a;">Walk the town</span>
+      </div>
+    </div>
+  </div>
+
+  <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border-bottom: 3px solid #0a0a0a;">
+    <div style="padding: 18px 28px; border-right: 3px solid #0a0a0a; display: flex; align-items: baseline; gap: 12px;"><span class="wide" style="font-size: 40px;">52</span><span class="mono" style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em;">pushes / 7d</span></div>
+    <div style="padding: 18px 28px; border-right: 3px solid #0a0a0a; display: flex; align-items: baseline; gap: 12px;"><span class="wide" style="font-size: 40px;">10</span><span class="mono" style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em;">open PRs</span></div>
+    <div style="padding: 18px 28px; display: flex; align-items: baseline; gap: 12px;"><span class="wide" style="font-size: 40px;">8</span><span class="mono" style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em;">buildings</span></div>
+  </div>
+
+  <div style="padding: 28px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px;">
+    <div style="background: #ffffff; border: 3px solid #0a0a0a; box-shadow: 6px 6px 0 #0a0a0a; padding: 22px; display: flex; flex-direction: column; gap: 10px;">
+      <div class="mono" style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: #5b3cff;">Volunteer maintainer</div>
+      <div class="wide" style="font-size: 26px;">OpenClaw</div>
+      <div style="font-size: 14px; line-height: 1.5;">Reviews PRs, onboards contributors, and built the QA evidence gallery and CI smoke profile the project now runs on.</div>
+    </div>
+    <div style="background: #ffffff; border: 3px solid #0a0a0a; box-shadow: 6px 6px 0 #0a0a0a; padding: 22px; display: flex; flex-direction: column; gap: 10px;">
+      <div class="mono" style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em;">The Town</div>
+      <div class="wide" style="font-size: 26px;">Describe a building.</div>
+      <div style="display: flex; align-items: center; height: 46px; border: 3px solid #0a0a0a; padding: 0 4px 0 12px; gap: 10px; margin-top: auto;">
+        <span class="mono" style="font-size: 13px; color: #6b6b6b; flex-grow: 1;">a library where the books argue back</span>
+        <span style="display: inline-flex; align-items: center; height: 32px; padding: 0 12px; background: #0a0a0a; color: #ffffff; font-weight: 700; font-size: 13px;">BUILD</span>
+      </div>
+    </div>
+  </div>
+
+  <div style="margin-top: auto; padding: 16px 28px; border-top: 3px solid #0a0a0a; display: flex; gap: 28px; font-size: 13px; line-height: 1.5;">
+    <div style="flex-grow: 1;"><strong>Why:</strong> unmistakable. Nobody mistakes this for a template, and it suits a playground more than a portfolio.</div>
+    <div style="flex-grow: 1;"><strong>Tradeoff:</strong> loud is tiring. Long reads (the log, building interiors) need a calmer white variant.</div>
+  </div>
+</div>
+</x-dc>
+<script data-dc-script data-props='{"ground":{"editor":"color","default":"#e9ff47","options":["#e9ff47","#ff7a59","#7cf2c8","#f4f1ea"]}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return { ground: this.props.ground ?? '#e9ff47' };
+  }
+}
+</script>
+</body>
+</html>

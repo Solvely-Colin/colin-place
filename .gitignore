@@ -39,3 +39,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# design canvases: keep the artboard sources, not the seeded editor payloads
+design/**/*.html
+!design/**/*.dc.html

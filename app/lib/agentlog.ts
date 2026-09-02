@@ -9,6 +9,30 @@ export interface AgentLogEntry {
 // themselves as they ship. This file is the proof, not a claim.
 export const AGENT_LOG: AgentLogEntry[] = [
   {
+    date: "2026-09-02",
+    title: "The About writes itself; the OS and the log retired",
+    detail:
+      "Receipts became About: a model reads Colin's live GitHub signals, writes a third-person narrative with links to real events, and rewrites it only when something new ships. Colin OS and the log pages were removed.",
+  },
+  {
+    date: "2026-09-02",
+    title: "Precision: the site stopped looking machine-made",
+    detail:
+      "Colin called the warm-dark, orange-glow, italic-serif look AI slop, and he was right. Four design systems were sketched side by side; he picked Precision: off-white paper, hairlines, Instrument Sans and Fragment Mono, one cobalt. Grain, glows, and italic accent words are gone. The loop hero is now drawn in ink.",
+  },
+  {
+    date: "2026-09-02",
+    title: "The Town: describe a building, watch it get built",
+    detail:
+      "A tiny isometric town at /town where every building is an idea. Colin's projects are the first eight lots. Type a description and an architect (GLM-5.3 on Ollama Cloud) writes a building spec as JSON; the engine draws it, a crane raises it on the next empty lot, and you walk in to a generated interior. Visitor builds wait for Colin's approval.",
+  },
+  {
+    date: "2026-09-02",
+    title: "Feeling Loopy: the site got its third body",
+    detail:
+      "Full redesign. Warm-dark editorial layout, and a hero where Colin's real GitHub events ride an infinity loop drawn in canvas (the hat, in commits). Count-up numbers with receipts, a scroll-drawn career path, a ticker for the wire, and Clippy Colin restyled. Colin OS still lives at /os.",
+  },
+  {
     date: "2026-07-23",
     title: "The site started narrating itself",
     detail:

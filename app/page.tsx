@@ -1,58 +1,37 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
-import {
-  AppWindow,
-  ArrowUpRight,
-  Bot,
-  GitFork,
-  Mail,
-  Radio,
-  Star,
-} from "lucide-react";
+import { ArrowDown, ArrowUpRight, Building2, GitFork, GitPullRequestDraft, Star } from "lucide-react";
+import { after } from "next/server";
 import { fetchPulse } from "./lib/pulse";
+import { loadAbout, regenerateAbout } from "./lib/about";
 import { fetchGithubActivity, type FeedItem } from "./lib/activity";
 import { fetchRepos, type RepoCard } from "./lib/repos";
 import { DROPS } from "./lib/drops";
 import { AGENT_LOG } from "./lib/agentlog";
 import { formatDate } from "./lib/dates";
+import { BIG_NUMBERS, CONTACT_LINKS, ECOSYSTEMS, NOW_ITEMS, STACK } from "./lib/profile";
 import agentOps from "../public/agent-ops.json";
-import { Wire } from "./components/broadcast/Wire";
-import { TimeAgo } from "./components/broadcast/TimeAgo";
-import { TimelineFeed } from "./components/broadcast/TimelineFeed";
-import { Companion } from "./components/broadcast/Companion";
+import { Intro } from "./components/site/Intro";
+import { Nav } from "./components/site/Nav";
+import { LoopField } from "./components/site/LoopField";
+import { Ticker } from "./components/site/Ticker";
+import { Section } from "./components/site/Section";
+import { Reveal, Stagger, Item } from "./components/site/Reveal";
+import { CountUp } from "./components/site/CountUp";
+import { TiltCard } from "./components/site/TiltCard";
+import { LocalClock } from "./components/site/LocalClock";
+import { Presence } from "./components/site/Presence";
+import { TimeAgo } from "./components/site/TimeAgo";
+import { Journey } from "./components/site/Journey";
+import { Companion } from "./components/site/Companion";
 
 export const revalidate = 600;
 
 export const metadata: Metadata = {
   description:
-    "A personal site that broadcasts itself: live GitHub telemetry, an agent-written changelog, and builds shipped in the open by Colin Johnson.",
+    "Colin Johnson: open-source maintainer at OpenClaw, admin on the 64k-star GSD project, CRM architect for four brands. A site built by his own agents, live from GitHub, with receipts.",
 };
-
-const CONTACT_LINKS = [
-  { label: "Email", value: "hello@colin.place", href: "mailto:hello@colin.place" },
-  { label: "X / Twitter", value: "@colinsolvely", href: "https://x.com/colinsolvely" },
-  { label: "GitHub", value: "Solvely-Colin", href: "https://github.com/Solvely-Colin" },
-  { label: "LinkedIn", value: "Colin W. Johnson", href: "https://www.linkedin.com/in/colin-w-johnson/" },
-];
-
-const NOW_ITEMS = [
-  {
-    title: "Volunteer-maintaining OpenClaw",
-    detail: "PR review, contributor onboarding, and QA evidence infrastructure for the open-source personal AI assistant.",
-  },
-  {
-    title: "Building agent tooling at Solvely",
-    detail: "This site included — every deploy here is planned, written, and shipped by agent sessions.",
-  },
-  {
-    title: "Senior Manager, CRM at Youth Enrichment Brands",
-    detail: "HubSpot architecture, custom apps, and lifecycle automation across four franchise brands.",
-  },
-  {
-    title: "Exploring developer-relations & ecosystem roles",
-    detail: "If that's you, contact is at the bottom of this page.",
-  },
-];
 
 const LANG_COLORS: Record<string, string> = {
   TypeScript: "#3178c6",
@@ -63,78 +42,57 @@ const LANG_COLORS: Record<string, string> = {
   HTML: "#e34c26",
   CSS: "#563d7c",
   MDX: "#fcb32c",
+  Swift: "#f05138",
+  Kotlin: "#a97bff",
 };
-
-function SectionHeading({
-  id,
-  title,
-  blurb,
-}: {
-  id?: string;
-  title: string;
-  blurb: string;
-}) {
-  return (
-    <div id={id} className="scroll-mt-20 mb-4">
-      <h2 className="text-xl font-bold text-stone-800">{title}</h2>
-      <p className="text-sm text-stone-600 mt-0.5">{blurb}</p>
-    </div>
-  );
-}
 
 function RepoTile({ repo }: { repo: RepoCard }) {
   return (
-    <a
-      href={repo.url}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="group block p-4 rounded-xl bg-white/70 border border-stone-200/70 hover:border-stone-300 hover:bg-white hover:shadow-md transition"
-    >
-      <div className="flex items-center justify-between gap-2">
-        <span className="font-bold text-stone-800 group-hover:text-orange-700 transition truncate">
-          {repo.name}
-        </span>
-        <span className="flex items-center gap-2 text-xs text-stone-600 shrink-0">
+    <TiltCard href={repo.url} external className="p-5 h-full" max={4}>
+      <div className="flex items-start justify-between gap-3">
+        <span className="font-medium text-lg text-ink leading-tight tracking-tight">{repo.name}</span>
+        <span className="flex items-center gap-3 font-mono text-[11px] text-ink-mute shrink-0 pt-1">
           {repo.stars > 0 && (
-            <span className="flex items-center gap-0.5">
-              <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
+            <span className="flex items-center gap-1">
+              <Star className="w-3 h-3 fill-ink-mute text-ink-mute" />
               {repo.stars}
             </span>
           )}
           {repo.language && (
-            <span className="flex items-center gap-1">
-              <span
-                className="w-2 h-2 rounded-full"
-                style={{ backgroundColor: LANG_COLORS[repo.language] ?? "#8b8b8b" }}
-              />
+            <span className="flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full" style={{ backgroundColor: LANG_COLORS[repo.language] ?? "#8b8b8b" }} />
               {repo.language}
             </span>
           )}
         </span>
       </div>
-      <p className="text-sm text-stone-600 mt-1 leading-relaxed line-clamp-2">
+      <p className="text-[14px] text-ink-dim mt-2 leading-relaxed line-clamp-2">
         {repo.description ?? "Fresh from the Solvely lab."}
       </p>
-    </a>
+      <p className="font-mono text-[11px] text-ink-mute mt-4">
+        {repo.role} · pushed {formatDate(repo.pushedAt)}
+      </p>
+    </TiltCard>
   );
 }
 
-export default async function Broadcast() {
-  const [pulse, github, repos] = await Promise.all([
-    fetchPulse(),
-    fetchGithubActivity(),
-    fetchRepos(),
-  ]);
-  const wireItems: FeedItem[] = [...github, ...DROPS]
-    .sort((a, b) => b.at.localeCompare(a.at))
-    .slice(0, 12);
+export default async function Home() {
+  const [pulse, github, repos] = await Promise.all([fetchPulse(), fetchGithubActivity(), fetchRepos()]);
+  const allEvents: FeedItem[] = [...github, ...DROPS].sort((a, b) => b.at.localeCompare(a.at));
+  const wireItems = allEvents.slice(0, 30);
+  const aboutInputs = { pulse, events: allEvents, repos };
+  const about = await loadAbout(aboutInputs);
+  if (about.stale && about.canRewrite) {
+    // Serve what we have now; rewrite after the response and it shows on the next visit.
+    after(() => regenerateAbout(aboutInputs));
+  }
   const lastDeploy = AGENT_LOG[0];
   const ops = agentOps as unknown as {
     generatedAt: string;
     summary: { automationCount: number; scheduledAgentRunsPerDay: number };
   };
 
-  const stats = [
+  const liveStats = [
     { n: pulse.pushes7d, label: "pushes this week" },
     { n: pulse.openPrs.length, label: "open PRs" },
     { n: ops.summary.automationCount, label: "automations on duty" },
@@ -142,221 +100,508 @@ export default async function Broadcast() {
   ];
 
   return (
-    <div className="min-h-screen">
-      {/* Top bar */}
-      <header className="sticky top-0 z-50 backdrop-blur-xl bg-[#f0e9db]/80 border-b border-stone-200/60">
-        <div className="mx-auto max-w-2xl px-5 h-12 flex items-center gap-4">
-          <Link href="/" className="font-bold text-stone-800 tracking-tight">
-            colin<span className="text-orange-500">.</span>place
-          </Link>
-          <span className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide text-red-600">
-            <span className="relative flex w-2 h-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-60" />
-              <span className="relative inline-flex rounded-full w-2 h-2 bg-red-500" />
-            </span>
-            Live
-          </span>
-          <nav className="ml-auto flex items-center gap-4 text-sm text-stone-600">
-            <a href="#log" className="hidden sm:inline hover:text-stone-900 transition">Log</a>
-            <a href="#projects" className="hidden sm:inline hover:text-stone-900 transition">Projects</a>
-            <a href="#contact" className="hidden sm:inline hover:text-stone-900 transition">Contact</a>
-            <Link
-              href="/os"
-              className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-stone-800 text-white text-xs font-medium hover:bg-stone-700 transition"
-            >
-              <AppWindow className="w-3.5 h-3.5" />
-              Colin OS
-            </Link>
-          </nav>
-        </div>
-      </header>
+    <>
+      <Intro />
+      <Nav />
 
-      <main className="mx-auto max-w-2xl px-5 pb-40">
-        {/* Hero */}
-        <section className="pt-12 sm:pt-16 pb-10">
-          <div className="flex items-start justify-between gap-4">
-            <div>
-              <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-orange-600 mb-3">
-                Live from Colin&apos;s workshop
+      <main>
+        {/* ---------------------------------------------------------------- */}
+        {/* Hero: the ∞ drawn in real events                                  */}
+        {/* ---------------------------------------------------------------- */}
+        <section className="relative min-h-[100svh] flex flex-col justify-end overflow-hidden border-b border-line">
+          <LoopField events={wireItems} />
+
+          <div className="relative z-10 pointer-events-none mx-auto max-w-[1400px] w-full px-5 sm:px-8 pt-28 pb-10 sm:pb-14">
+            <Reveal>
+              <p className="eyebrow mb-5 flex flex-wrap items-center gap-x-3 gap-y-1">
+                <span className="text-ink-dim">Colin Johnson</span>
+                <span>·</span>
+                <span>Mishawaka, Indiana</span>
+                <span>·</span>
+                <span className="text-loop">open to DevRel &amp; ecosystem roles</span>
               </p>
-              <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight text-stone-900">
-                Colin Johnson
+            </Reveal>
+
+            <Reveal delay={0.08}>
+              <h1 className="display text-[clamp(2.8rem,8vw,7rem)] text-ink">
+                Ships in the open.
+                <br />
+                Keeps the receipts.
               </h1>
-              <p className="text-stone-700 leading-relaxed mt-4 max-w-lg">
-                Builder, connector, community person. This site is planned, written,
-                tested, and deployed by AI agents — in the open, with receipts. What
-                you&apos;re reading is the feed of that happening.
-              </p>
-            </div>
-            <img
-              src="/clippy.png"
-              alt="Clippy Colin, the site mascot"
-              className="w-24 sm:w-32 h-auto shrink-0 -mt-2"
-              style={{ filter: "drop-shadow(0 12px 20px rgba(0,0,0,0.15))" }}
-            />
-          </div>
+            </Reveal>
 
-          {/* Live status card */}
-          <div id="now" className="scroll-mt-20 mt-8 p-4 sm:p-5 rounded-2xl bg-white/70 border border-stone-200/70 shadow-sm">
-            <div className="flex items-baseline justify-between gap-2 mb-3">
-              <p className="text-[11px] font-semibold uppercase tracking-wide text-stone-500 flex items-center gap-1.5">
-                <Radio className="w-3.5 h-3.5 text-red-500" />
-                Right now
-              </p>
-              <p className="text-[11px] text-stone-500">
-                telemetry <TimeAgo iso={pulse.generatedAt} />
-              </p>
+            <div className="grid lg:grid-cols-[minmax(0,1fr)_auto] items-end gap-8 mt-10">
+              <Reveal delay={0.16}>
+                <p className="pointer-events-auto max-w-[48ch] text-ink-dim text-base sm:text-lg leading-relaxed">
+                  Volunteer maintainer at OpenClaw, admin on the 64k-star GSD project, and the CRM
+                  architect behind four franchise brands. This site is planned, written, and
+                  deployed by his own agents, live from GitHub, and every claim on it links to a
+                  public page.
+                </p>
+              </Reveal>
+              <Reveal delay={0.24} className="pointer-events-auto flex flex-wrap gap-3">
+                <a
+                  href="#about"
+                  className="group inline-flex items-center gap-2 h-10 px-4 rounded-md bg-ink text-ground font-medium text-sm hover:bg-ink-dim transition"
+                >
+                  Read the about
+                  <ArrowDown className="w-4 h-4 transition-transform group-hover:translate-y-0.5" />
+                </a>
+                <a
+                  href="#contact"
+                  className="inline-flex items-center gap-2 h-10 px-4 rounded-md border border-line-strong bg-ground-2 text-ink text-sm font-medium hover:border-ink transition"
+                >
+                  Say hi
+                </a>
+              </Reveal>
             </div>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center">
-              {stats.map((stat) => (
-                <div key={stat.label} className="p-2.5 rounded-xl bg-stone-50/80 border border-stone-200/60">
-                  <p className="text-xl font-extrabold text-stone-800 tabular-nums">{stat.n}</p>
-                  <p className="text-[11px] font-semibold uppercase tracking-wide text-stone-500 leading-tight">
-                    {stat.label}
-                  </p>
-                </div>
-              ))}
-            </div>
-            {pulse.shepherding.length > 0 && (
-              <p className="text-sm text-stone-600 mt-3">
-                Currently shepherding{" "}
-                {pulse.shepherding.map((repo, i) => (
-                  <span key={repo.name}>
-                    {i > 0 && (i === pulse.shepherding.length - 1 ? " and " : ", ")}
-                    <a
-                      href={repo.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="font-semibold text-stone-800 hover:text-orange-700 underline underline-offset-4 decoration-stone-300"
-                    >
-                      {repo.name}
-                    </a>
-                  </span>
+
+            <Reveal delay={0.3}>
+              <div className="pointer-events-auto mt-12 flex flex-wrap items-end gap-x-10 gap-y-5">
+                {liveStats.map((s) => (
+                  <div key={s.label}>
+                    <p className="font-mono text-2xl sm:text-3xl text-ink leading-none">{s.n}</p>
+                    <p className="eyebrow mt-1.5 !text-[10px]">{s.label}</p>
+                  </div>
                 ))}
-                .
+                <div className="ml-auto text-right">
+                  <p className="font-mono text-[11px] text-ink-mute">
+                    telemetry <TimeAgo iso={pulse.generatedAt} /> · last agent deploy {formatDate(lastDeploy.date)}
+                  </p>
+                  <Presence className="font-mono text-[11px] text-ink-dim mt-1 inline-block" />
+                </div>
+              </div>
+              <p className="font-mono text-[11px] text-ink-mute mt-8">
+                <span className="live-dot mr-2 align-middle" />
+                each light on the loop is a real event from Colin&apos;s public GitHub feed · hover one
               </p>
-            )}
-            <p className="text-sm text-stone-600 mt-1.5 flex items-start gap-1.5">
-              <Bot className="w-4 h-4 shrink-0 mt-0.5 text-pink-600" />
-              <span>
-                Latest agent deploy — <span className="font-semibold text-stone-800">&ldquo;{lastDeploy.title}&rdquo;</span>{" "}
-                · {formatDate(lastDeploy.date)}
+            </Reveal>
+          </div>
+        </section>
+
+        <Ticker initialItems={wireItems} />
+
+        {/* ---------------------------------------------------------------- */}
+        {/* 01 Now                                                           */}
+        {/* ---------------------------------------------------------------- */}
+        <Section
+          id="now"
+          index="01"
+          kicker="Right now"
+          title={
+            <>
+              What he&apos;s actually doing
+            </>
+          }
+          blurb={
+            <>
+              <LocalClock withStatus className="block text-ink font-mono text-[13px]" />
+              <span className="block mt-2">
+                The status line is a guess. Everything else on this page is not.
               </span>
+            </>
+          }
+        >
+          <div className="grid lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] gap-6 lg:gap-10 items-start">
+            <Reveal className="relative">
+              <div className="relative rounded-lg overflow-hidden border border-line bg-ground-2 aspect-[3/4] max-w-[520px]">
+                <Image
+                  src="/colin.jpg"
+                  alt="Colin Johnson at his desk, wearing a cap that says Feeling Loopy"
+                  width={900}
+                  height={1200}
+                  sizes="(min-width: 1024px) 40vw, 100vw"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <p className="eyebrow mt-3">feeling loopy · the hat is real, so is the loop above</p>
+            </Reveal>
+
+            <Stagger className="grid sm:grid-cols-2 gap-3">
+              {NOW_ITEMS.map((item) => (
+                <Item key={item.title}>
+                  <TiltCard href={item.href} external={!!item.href && !item.href.startsWith("#")} className="p-5 h-full" max={4}>
+                    <h3 className="font-medium text-lg text-ink leading-snug tracking-tight">{item.title}</h3>
+                    <p className="text-[14px] text-ink-dim mt-2 leading-relaxed">{item.detail}</p>
+                  </TiltCard>
+                </Item>
+              ))}
+              {pulse.shepherding.length > 0 && (
+                <Item className="sm:col-span-2">
+                  <div className="p-5 rounded-lg border border-line bg-ground-2">
+                    <p className="eyebrow mb-2">Repos he pushed to this week</p>
+                    <p className="text-ink-dim leading-relaxed">
+                      {pulse.shepherding.map((repo, i) => (
+                        <span key={repo.name}>
+                          {i > 0 && (i === pulse.shepherding.length - 1 ? " and " : ", ")}
+                          <a
+                            href={repo.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="link-draw text-ink font-medium"
+                          >
+                            {repo.name}
+                          </a>
+                        </span>
+                      ))}
+                      .
+                    </p>
+                  </div>
+                </Item>
+              )}
+            </Stagger>
+          </div>
+        </Section>
+
+        {/* ---------------------------------------------------------------- */}
+        {/* 02 Numbers                                                       */}
+        {/* ---------------------------------------------------------------- */}
+        <Section
+          id="numbers"
+          index="02"
+          kicker="By the numbers"
+          title={
+            <>
+              Counted, not claimed
+            </>
+          }
+          blurb="Each one links to the public page it comes from. If GitHub disagrees, GitHub wins."
+        >
+          <Stagger className="grid sm:grid-cols-2 lg:grid-cols-3 gap-px bg-line rounded-lg overflow-hidden border border-line">
+            {BIG_NUMBERS.map((n) => {
+              const inner = (
+                <>
+                  <p className="display text-[clamp(3rem,6vw,5rem)] text-ink leading-none">
+                    <CountUp to={n.value} suffix={n.suffix} />
+                  </p>
+                  <p className="font-medium text-lg text-ink mt-4 tracking-tight">{n.label}</p>
+                  <p className="text-[14px] text-ink-dim mt-1 leading-relaxed">{n.note}</p>
+                  {n.href && (
+                    <span className="inline-flex items-center gap-1 font-mono text-[11px] text-ink-mute group-hover:text-loop mt-4 transition">
+                      receipt <ArrowUpRight className="w-3 h-3" />
+                    </span>
+                  )}
+                </>
+              );
+              return (
+                <Item key={n.label} className="bg-ground">
+                  {n.href ? (
+                    <a href={n.href} target="_blank" rel="noopener noreferrer" className="spot group block p-7 sm:p-9 h-full">
+                      {inner}
+                    </a>
+                  ) : (
+                    <div className="p-7 sm:p-9 h-full">{inner}</div>
+                  )}
+                </Item>
+              );
+            })}
+            <Item className="bg-ground">
+              <div className="p-7 sm:p-9 h-full flex flex-col">
+                <p className="eyebrow mb-4">Ships in</p>
+                <div className="flex flex-wrap gap-2">
+                  {STACK.map((s) => (
+                    <span key={s} className="px-2 py-1 rounded border border-line font-mono text-[11px] text-ink-mute">
+                      {s}
+                    </span>
+                  ))}
+                </div>
+                {pulse.languages.length > 0 && (
+                  <div className="mt-auto pt-6">
+                    <p className="eyebrow mb-2 !text-[10px]">language mix, last 180 days</p>
+                    <div className="flex h-1.5 rounded-full overflow-hidden bg-line">
+                      {pulse.languages.map((l) => (
+                        <span
+                          key={l.name}
+                          style={{ width: l.share + "%", backgroundColor: LANG_COLORS[l.name] ?? "#8b8b8b" }}
+                          title={`${l.name} ${l.share}%`}
+                        />
+                      ))}
+                    </div>
+                    <p className="font-mono text-[11px] text-ink-mute mt-2">
+                      {pulse.languages.map((l) => `${l.name} ${l.share}%`).join(" · ")}
+                    </p>
+                  </div>
+                )}
+              </div>
+            </Item>
+          </Stagger>
+        </Section>
+
+        {/* ---------------------------------------------------------------- */}
+        {/* 03 Work                                                          */}
+        {/* ---------------------------------------------------------------- */}
+        <Section
+          id="work"
+          index="03"
+          kicker="Work"
+          title={
+            <>
+              Four ecosystems, one habit
+            </>
+          }
+          blurb="Find the friction developers keep hitting, turn it into issues, docs, and fixes, and prove the fix with something a reviewer can re-run."
+        >
+          <Stagger className="grid md:grid-cols-2 gap-4">
+            {ECOSYSTEMS.map((eco) => (
+              <Item key={eco.name}>
+                <TiltCard href={eco.href} external className="p-6 sm:p-8 h-full">
+                  <div className="flex items-start justify-between gap-4">
+                    <div>
+                      <p className="eyebrow !text-loop mb-2">{eco.role}</p>
+                      <h3 className="display text-2xl sm:text-3xl text-ink">{eco.name}</h3>
+                    </div>
+                    <ArrowUpRight className="w-5 h-5 text-ink-mute shrink-0 mt-1" />
+                  </div>
+                  <p className="text-ink-dim mt-5 leading-relaxed">{eco.blurb}</p>
+                  <div className="flex flex-wrap gap-1.5 mt-6">
+                    {eco.tags.map((t) => (
+                      <span key={t} className="px-2 py-0.5 rounded border border-line font-mono text-[11px] text-ink-mute">
+                        {t}
+                      </span>
+                    ))}
+                  </div>
+                </TiltCard>
+              </Item>
+            ))}
+          </Stagger>
+
+          <div className="mt-14">
+            <Reveal>
+              <div className="flex items-baseline justify-between gap-4 mb-5">
+                <h3 className="font-medium text-xl text-ink tracking-tight">From the lab</h3>
+                <p className="font-mono text-[11px] text-ink-mute">
+                  {repos.fallback ? "snapshot · GitHub unreachable" : "pulled live from GitHub"}
+                </p>
+              </div>
+            </Reveal>
+            <Stagger className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              {repos.featured.map((repo) => (
+                <Item key={repo.name}>
+                  <RepoTile repo={repo} />
+                </Item>
+              ))}
+            </Stagger>
+            {repos.hacking.length > 0 && (
+              <>
+                <Reveal>
+                  <p className="eyebrow mt-8 mb-3 flex items-center gap-2">
+                    <GitFork className="w-3.5 h-3.5" /> forks he hacks on
+                  </p>
+                </Reveal>
+                <Stagger className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                  {repos.hacking.map((repo) => (
+                    <Item key={repo.name}>
+                      <RepoTile repo={repo} />
+                    </Item>
+                  ))}
+                </Stagger>
+              </>
+            )}
+          </div>
+        </Section>
+
+        {/* ---------------------------------------------------------------- */}
+        {/* 04 About, written by the site                                     */}
+        {/* ---------------------------------------------------------------- */}
+        <Section
+          id="about"
+          index="04"
+          kicker="About"
+          title="About Colin, rewritten as he ships"
+          blurb={
+            <span className="font-mono text-[12px] leading-relaxed">
+              {about.record.source === "model" ? (
+                <>
+                  Written by {about.record.model} from his public GitHub, <TimeAgo iso={about.record.generatedAt} />.
+                  {about.stale ? " New activity since; the next rewrite is queued." : " Up to date with the wire."}
+                </>
+              ) : (
+                <>
+                  Hand-written for now. Once the model key is in, the site rewrites this itself whenever a PR, release, or repo lands.
+                </>
+              )}
+            </span>
+          }
+        >
+          <div className="grid lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] gap-10 lg:gap-16">
+            <Reveal>
+              <p className="text-[clamp(1.35rem,2.4vw,1.9rem)] font-medium tracking-tight leading-snug text-ink max-w-[30ch]">
+                {about.record.narrative.lede}
+              </p>
+              <div className="mt-7 space-y-5 text-ink-dim leading-relaxed max-w-[62ch]">
+                {about.record.narrative.paragraphs.map((p, i) => (
+                  <p key={i}>{p}</p>
+                ))}
+              </div>
+              <p className="mt-6 font-mono text-[11px] text-ink-mute">
+                Last rewrite: {about.record.narrative.reason}
+              </p>
+            </Reveal>
+
+            <div>
+              <Reveal>
+                <div className="flex items-baseline justify-between mb-3">
+                  <h3 className="font-medium text-xl text-ink tracking-tight">Open right now</h3>
+                  <span className="font-mono text-[11px] text-ink-mute">{pulse.openPrs.length} open</span>
+                </div>
+              </Reveal>
+              {pulse.openPrs.length === 0 ? (
+                <p className="text-ink-dim">
+                  {pulse.ok ? "Nothing open. Inbox zero, PR edition." : "GitHub is not answering right now."}
+                </p>
+              ) : (
+                <Stagger className="divide-y divide-line border-y border-line" gap={0.05}>
+                  {pulse.openPrs.slice(0, 6).map((pr) => (
+                    <Item key={pr.url}>
+                      <a
+                        href={pr.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="group grid grid-cols-[auto_1fr_auto] items-start gap-4 py-3 hover:bg-ground-2 -mx-3 px-3 rounded-md transition"
+                      >
+                        <span className="font-mono text-[12px] text-ink-mute pt-0.5">#{pr.number}</span>
+                        <span className="min-w-0">
+                          <span className="block text-[15px] text-ink group-hover:text-loop transition leading-snug">{pr.title}</span>
+                          <span className="block font-mono text-[11px] text-ink-mute mt-1">
+                            {pr.repo}
+                            {pr.draft && (
+                              <span className="inline-flex items-center gap-1 ml-2 text-butter">
+                                <GitPullRequestDraft className="w-3 h-3" /> draft
+                              </span>
+                            )}
+                          </span>
+                        </span>
+                        <TimeAgo iso={pr.updatedAt} className="font-mono text-[11px] text-ink-mute pt-0.5" />
+                      </a>
+                    </Item>
+                  ))}
+                </Stagger>
+              )}
+
+              {about.record.narrative.highlights.length > 0 && (
+                <Reveal className="mt-10">
+                  <h3 className="font-medium text-xl text-ink tracking-tight mb-3">Worth a look</h3>
+                  <div className="grid gap-2">
+                    {about.record.narrative.highlights.map((h) => (
+                      <a
+                        key={h.url + h.title}
+                        href={h.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="spot group flex items-center gap-4 p-4 rounded-lg border border-line bg-ground-2 transition"
+                      >
+                        <span className="min-w-0">
+                          <span className="block text-[14px] font-medium text-ink group-hover:text-loop transition">{h.title}</span>
+                          <span className="block text-[13px] text-ink-dim mt-0.5">{h.detail}</span>
+                        </span>
+                        <ArrowUpRight className="w-4 h-4 ml-auto shrink-0 text-ink-mute group-hover:text-loop transition" />
+                      </a>
+                    ))}
+                  </div>
+                </Reveal>
+              )}
+            </div>
+          </div>
+        </Section>
+
+        {/* ---------------------------------------------------------------- */}
+        {/* 05 Path                                                          */}
+        {/* ---------------------------------------------------------------- */}
+        <Section
+          id="path"
+          index="05"
+          kicker="The path"
+          title={
+            <>
+              From CRM hygiene to maintainer
+            </>
+          }
+          blurb="Sales ops taught him that a system nobody trusts is a system nobody uses. He has been building trust into systems ever since."
+        >
+          <div className="max-w-3xl">
+            <Journey />
+          </div>
+        </Section>
+
+        {/* ---------------------------------------------------------------- */}
+        {/* 06 Contact                                                       */}
+        {/* ---------------------------------------------------------------- */}
+        <section id="contact" className="scroll-mt-20 relative py-20 sm:py-28 border-t border-line">
+          <div className="relative mx-auto max-w-[1400px] px-5 sm:px-8">
+            <Reveal>
+              <p className="eyebrow mb-5">
+                <span className="text-loop">06</span> / Contact
+              </p>
+              <h2 className="display text-[clamp(2.4rem,6vw,5rem)] text-ink">
+                Let&apos;s build something.
+              </h2>
+            </Reveal>
+            <Reveal delay={0.1}>
+              <a
+                href="mailto:hello@colin.place"
+                className="link-draw inline-block mt-8 font-medium tracking-tight text-[clamp(1.4rem,3.5vw,2.75rem)] text-ink hover:text-loop transition-colors"
+              >
+                hello@colin.place
+              </a>
+              <p className="text-ink-dim mt-4 max-w-xl leading-relaxed">
+                Developer-relations and ecosystem roles, collaborations, consulting, and interesting
+                technical work. He reads everything.
+              </p>
+            </Reveal>
+
+            <Stagger className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3 mt-12">
+              {CONTACT_LINKS.map((link) => (
+                <Item key={link.label}>
+                  <a
+                    href={link.href}
+                    target={link.href.startsWith("mailto:") ? undefined : "_blank"}
+                    rel="noopener noreferrer"
+                    className="spot group flex items-center justify-between p-5 rounded-lg border border-line bg-ground-2 transition"
+                  >
+                    <span>
+                      <span className="eyebrow block">{link.label}</span>
+                      <span className="block text-ink mt-1 group-hover:text-loop transition">{link.value}</span>
+                    </span>
+                    <ArrowUpRight className="w-4 h-4 text-ink-mute group-hover:text-loop transition" />
+                  </a>
+                </Item>
+              ))}
+            </Stagger>
+
+            <Reveal delay={0.1}>
+              <Link
+                href="/town"
+                className="spot group mt-6 flex items-center gap-5 p-6 rounded-lg border border-line bg-ground-2 hover:border-loop transition"
+              >
+                <Building2 className="w-8 h-8 text-loop shrink-0" />
+                <span className="min-w-0">
+                  <span className="block font-medium text-lg text-ink tracking-tight">This site also has a town.</span>
+                  <span className="block text-[14px] text-ink-dim mt-1">
+                    Every building is an idea. Walk around, walk in, and describe a new one: the architect
+                    builds it on the next empty lot while you watch.
+                  </span>
+                </span>
+                <ArrowUpRight className="w-5 h-5 ml-auto shrink-0 text-ink-mute group-hover:text-loop transition" />
+              </Link>
+            </Reveal>
+          </div>
+        </section>
+
+        <footer className="border-t border-line">
+          <div className="mx-auto max-w-[1400px] px-5 sm:px-8 py-10 grid sm:grid-cols-[1fr_auto] gap-6 items-end">
+            <p className="text-[13px] text-ink-mute leading-relaxed max-w-xl">
+              Every pixel of this page, including this sentence, was planned, written, and deployed by
+              agent sessions, with Colin approving what ships. The latest of those deploys:{" "}
+              <span className="text-ink-dim">&ldquo;{lastDeploy.title}&rdquo;</span>.
+            </p>
+            <p className="font-mono text-[11px] text-ink-mute sm:text-right">
+              colin.place · live from GitHub · {new Date().getFullYear()}
             </p>
           </div>
-
-          {/* Now items */}
-          <div className="mt-4 grid sm:grid-cols-2 gap-2">
-            {NOW_ITEMS.map((item) => (
-              <div key={item.title} className="p-3.5 rounded-xl bg-amber-50/70 border border-amber-100/80">
-                <h3 className="font-semibold text-stone-800 text-sm">{item.title}</h3>
-                <p className="text-sm text-stone-600 mt-0.5 leading-relaxed">{item.detail}</p>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* The wire */}
-        <section className="py-8 border-t border-stone-200/70">
-          <SectionHeading
-            id="wire"
-            title="On the wire"
-            blurb="Colin's raw public activity, straight from GitHub. Refreshes itself."
-          />
-          <Wire initialItems={wireItems} />
-        </section>
-
-        {/* The log */}
-        <section className="py-8 border-t border-stone-200/70">
-          <SectionHeading
-            id="log"
-            title="The log"
-            blurb="One stream: Colin's journal, the agents' own changelog, and builds from the workshop. Every entry is a link."
-          />
-          <TimelineFeed />
-        </section>
-
-        {/* Projects */}
-        <section className="py-8 border-t border-stone-200/70">
-          <SectionHeading
-            id="projects"
-            title="Projects"
-            blurb={
-              repos.fallback
-                ? "A snapshot of Colin's public GitHub work."
-                : "Pulled live from Colin's public GitHub."
-            }
-          />
-          <div className="grid sm:grid-cols-2 gap-2">
-            {repos.featured.map((repo) => (
-              <RepoTile key={repo.name} repo={repo} />
-            ))}
-          </div>
-          {repos.hacking.length > 0 && (
-            <>
-              <p className="text-xs font-semibold text-stone-500 uppercase tracking-wide mt-4 mb-2 flex items-center gap-1.5">
-                <GitFork className="w-3.5 h-3.5" />
-                Forks he hacks on
-              </p>
-              <div className="grid sm:grid-cols-2 gap-2">
-                {repos.hacking.map((repo) => (
-                  <RepoTile key={repo.name} repo={repo} />
-                ))}
-              </div>
-            </>
-          )}
-        </section>
-
-        {/* Contact + OS easter egg */}
-        <section className="py-8 border-t border-stone-200/70">
-          <SectionHeading
-            id="contact"
-            title="Let's build something"
-            blurb="Open to collaborations, consulting, and interesting technical work."
-          />
-          <div className="grid sm:grid-cols-2 gap-2">
-            {CONTACT_LINKS.map((link) => (
-              <a
-                key={link.label}
-                href={link.href}
-                target={link.href.startsWith("mailto:") ? undefined : "_blank"}
-                rel="noopener noreferrer"
-                className="flex items-center justify-between p-3.5 rounded-xl bg-white/70 border border-stone-200/70 hover:bg-white hover:border-stone-300 transition group"
-              >
-                <span className="text-stone-600 text-sm flex items-center gap-2">
-                  {link.label === "Email" && <Mail className="w-3.5 h-3.5" />}
-                  {link.label}
-                </span>
-                <span className="font-medium text-stone-800 group-hover:text-orange-700 transition text-sm">
-                  {link.value}
-                </span>
-              </a>
-            ))}
-          </div>
-
-          <Link
-            href="/os"
-            className="group mt-6 flex items-center gap-4 p-5 rounded-2xl bg-stone-900 text-white hover:bg-stone-800 transition"
-          >
-            <AppWindow className="w-8 h-8 text-orange-400 shrink-0" />
-            <span className="min-w-0">
-              <span className="block font-bold">This site also has an operating system.</span>
-              <span className="block text-sm text-stone-300 mt-0.5">
-                Windows, a dock, a terminal, weather, shared cursors — the original Colin OS
-                lives on at /os. Try Cmd+K when you&apos;re in there.
-              </span>
-            </span>
-            <ArrowUpRight className="w-5 h-5 ml-auto shrink-0 text-stone-400 group-hover:text-white transition" />
-          </Link>
-
-          <p className="text-xs text-stone-500 mt-8 leading-relaxed">
-            Every pixel of this page — including this sentence — was written and deployed
-            by agent sessions, with Colin approving what ships.
-          </p>
-        </section>
+        </footer>
       </main>
 
       <Companion />
-    </div>
+    </>
   );
 }

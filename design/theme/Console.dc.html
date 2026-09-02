@@ -1,0 +1,102 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+  <style>
+    body { margin: 0; font-family: "Schibsted Grotesk", "Helvetica Neue", Arial, sans-serif; color: #e8eaed; -webkit-font-smoothing: antialiased; }
+    a { color: #e8eaed; text-decoration: none; } a:hover { color: #5cff8a; }
+    .mono { font-family: "JetBrains Mono", "SF Mono", Menlo, monospace; }
+    .dots { background-image: radial-gradient(#1f242b 1px, transparent 1px); background-size: 20px 20px; }
+  </style>
+</helmet>
+<div style="width: 1000px; height: 1060px; background: #0b0d10; display: flex; flex-direction: column; overflow: hidden; box-sizing: border-box;">
+
+  <div style="display: flex; align-items: stretch; border-bottom: 1px solid #1f242b;">
+    <div style="flex-grow: 1; padding: 22px 28px; display: flex; flex-direction: column; gap: 10px;">
+      <div class="mono" style="font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: #8a919b;">C · Console</div>
+      <div style="font-size: 30px; font-weight: 600; letter-spacing: -0.02em; line-height: 1.05;">Schibsted Grotesk + JetBrains Mono</div>
+      <div style="font-size: 14px; color: #8a919b; max-width: 520px; line-height: 1.5;">Cool near-black, not warm. Mono for every label and value, grotesk only for headlines and prose. One signal color, used like a status light.</div>
+    </div>
+    <div style="display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); width: 300px; border-left: 1px solid #1f242b;">
+      <div style="background: #0b0d10;"></div>
+      <div style="background: #12151a;"></div>
+      <div style="background: #1f242b;"></div>
+      <div style="background: #8a919b;"></div>
+      <div style="background: {{signal}};"></div>
+    </div>
+  </div>
+
+  <div style="display: flex; align-items: center; justify-content: space-between; height: 48px; padding: 0 28px; border-bottom: 1px solid #1f242b; background: #12151a;">
+    <div class="mono" style="font-size: 12px; display: flex; align-items: center; gap: 10px; color: #8a919b;">
+      <span style="color: #e8eaed; font-weight: 500;">colin.place</span><span>/</span><span>home</span>
+    </div>
+    <div class="mono" style="display: flex; align-items: center; gap: 22px; font-size: 12px; color: #8a919b;">
+      <span>work</span><span>receipts</span><span>town</span><span>log</span>
+      <span style="display: inline-flex; align-items: center; height: 28px; padding: 0 10px; border: 1px solid #2a313a; border-radius: 4px; color: #e8eaed;">colin-os</span>
+    </div>
+  </div>
+
+  <div class="dots" style="padding: 52px 28px 40px; display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 24px; border-bottom: 1px solid #1f242b;">
+    <div style="grid-column: span 8; display: flex; flex-direction: column; gap: 20px;">
+      <div class="mono" style="font-size: 12px; color: #8a919b; display: flex; align-items: center; gap: 10px;">
+        <span style="width: 7px; height: 7px; border-radius: 999px; background: {{signal}};"></span>
+        colin_johnson · mishawaka_in · telemetry 1m ago
+      </div>
+      <h1 style="margin: 0; font-size: 60px; font-weight: 600; letter-spacing: -0.03em; line-height: 1.0; text-wrap: balance;">Ships in the open. Keeps the receipts.</h1>
+      <p style="margin: 0; font-size: 16px; line-height: 1.6; color: #b4bac3; max-width: 540px;">Open-source maintainer, developer-community builder, agent-tooling person. Built by his own agents, live from GitHub, every claim linked to a public page.</p>
+      <div style="display: flex; gap: 10px;">
+        <span class="mono" style="display: inline-flex; align-items: center; height: 38px; padding: 0 14px; border-radius: 4px; background: {{signal}}; color: #0b0d10; font-size: 13px; font-weight: 500;">see_receipts →</span>
+        <span class="mono" style="display: inline-flex; align-items: center; height: 38px; padding: 0 14px; border-radius: 4px; border: 1px solid #2a313a; font-size: 13px;">walk_town</span>
+      </div>
+    </div>
+    <div class="mono" style="grid-column: span 4; align-self: end; border: 1px solid #1f242b; border-radius: 6px; background: #12151a; font-size: 12px;">
+      <div style="display: flex; justify-content: space-between; padding: 10px 14px; border-bottom: 1px solid #1f242b;"><span style="color: #8a919b;">pushes_7d</span><span style="color: {{signal}};">52</span></div>
+      <div style="display: flex; justify-content: space-between; padding: 10px 14px; border-bottom: 1px solid #1f242b;"><span style="color: #8a919b;">open_prs</span><span>10</span></div>
+      <div style="display: flex; justify-content: space-between; padding: 10px 14px;"><span style="color: #8a919b;">buildings</span><span>8</span></div>
+    </div>
+  </div>
+
+  <div style="padding: 28px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px;">
+    <div style="background: #12151a; border: 1px solid #1f242b; border-radius: 6px; padding: 22px; display: flex; flex-direction: column; gap: 12px;">
+      <div class="mono" style="font-size: 11px; color: {{signal}};">// volunteer maintainer</div>
+      <div style="font-size: 22px; font-weight: 600; letter-spacing: -0.02em;">OpenClaw</div>
+      <div style="font-size: 14px; line-height: 1.55; color: #b4bac3;">Reviews PRs, onboards contributors, and built the QA evidence gallery and CI smoke profile the project now runs on.</div>
+      <div class="mono" style="display: flex; gap: 6px; flex-wrap: wrap; font-size: 11px; color: #8a919b;">
+        <span style="padding: 3px 7px; border: 1px solid #2a313a; border-radius: 3px;">typescript</span>
+        <span style="padding: 3px 7px; border: 1px solid #2a313a; border-radius: 3px;">ios</span>
+        <span style="padding: 3px 7px; border: 1px solid #2a313a; border-radius: 3px;">ci</span>
+      </div>
+    </div>
+    <div style="background: #12151a; border: 1px solid #1f242b; border-radius: 6px; padding: 22px; display: flex; flex-direction: column; gap: 12px;">
+      <div class="mono" style="font-size: 11px; color: #8a919b;">// the town</div>
+      <div style="font-size: 22px; font-weight: 600; letter-spacing: -0.02em;">Describe a building.</div>
+      <div style="font-size: 14px; line-height: 1.55; color: #b4bac3;">The architect writes it as JSON, a crane raises it on the next empty lot, and you walk in.</div>
+      <div class="mono" style="display: flex; align-items: center; height: 42px; border: 1px solid #2a313a; border-radius: 4px; background: #0b0d10; padding: 0 6px 0 12px; gap: 10px; margin-top: auto; font-size: 13px;">
+        <span style="color: {{signal}};">&gt;</span>
+        <span style="color: #5c636d; flex-grow: 1;">a library where the books argue back</span>
+        <span style="display: inline-flex; align-items: center; height: 30px; padding: 0 10px; border-radius: 3px; background: #e8eaed; color: #0b0d10; font-weight: 500;">build</span>
+      </div>
+    </div>
+  </div>
+
+  <div style="margin-top: auto; padding: 16px 28px; border-top: 1px solid #1f242b; display: flex; gap: 28px; font-size: 13px; line-height: 1.5; color: #b4bac3;">
+    <div style="flex-grow: 1;"><strong style="color: #e8eaed;">Why:</strong> developer-native. It matches the receipts ethos: everything looks measured, logged, and reproducible.</div>
+    <div style="flex-grow: 1;"><strong style="color: #e8eaed;">Tradeoff:</strong> still dark, and the dev-tool look is its own cliché. Wins on discipline, not on surprise.</div>
+  </div>
+</div>
+</x-dc>
+<script data-dc-script data-props='{"signal":{"editor":"color","default":"#5cff8a","options":["#5cff8a","#7aa2ff","#ffb020","#ff5c7a"]}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return { signal: this.props.signal ?? '#5cff8a' };
+  }
+}
+</script>
+</body>
+</html>

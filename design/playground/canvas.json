@@ -1,0 +1,12 @@
+{
+  "artboards": [
+    { "file": "Main.dc.html", "title": "A · Say it, then you're in it", "x": 0, "y": 0, "w": 1000, "h": 700 },
+    { "file": "DirectionB.dc.html", "title": "B · Cabinet of curiosities", "x": 1100, "y": 0, "w": 1000, "h": 700 },
+    { "file": "DirectionC.dc.html", "title": "C · The zine", "x": 0, "y": 860, "w": 1000, "h": 700 },
+    { "file": "DirectionD.dc.html", "title": "D · A town of ideas", "x": 1100, "y": 860, "w": 1000, "h": 700 }
+  ],
+  "annotations": [
+    { "id": "pick-one", "x": 0, "y": -200, "w": 620, "text": "Four directions for the playground. Each pulls on a different axis: talk to it (A), wander it (B), read it (C), walk it (D).\nThese are sketches, not the build. Pick one, or name a mash-up (A+D is the obvious one), and the real thing gets built into A's frame." }
+  ],
+  "launch": { "view": "canvas" }
+}
