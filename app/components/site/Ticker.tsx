@@ -57,7 +57,7 @@ export function Ticker({ initialItems }: { initialItems: FeedItem[] }) {
         {[0, 1].map((copy) => (
           <div key={copy} className="flex shrink-0" aria-hidden={copy === 1}>
             <span className="flex items-center gap-2 px-6 font-mono text-[12px] text-loop uppercase tracking-[0.18em]">
-              <span className="live-dot" /> On the wire
+              <span className="live-dot" /> <span data-mut={copy === 0 ? "ticker-label" : undefined}>On the wire</span>
             </span>
             {tape.map((item) => (
               <a

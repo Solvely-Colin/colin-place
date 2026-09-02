@@ -23,7 +23,7 @@ export function Section({ id, index, title, kicker, blurb, children, className =
             <div>
               <p className="eyebrow mb-4">
                 <span className="text-loop" data-section-index={index}>{index}</span>
-                {kicker ? <span> / {kicker}</span> : null}
+                {kicker ? <span> / <span data-mut={`kicker-${id}`}>{kicker}</span></span> : null}
               </p>
               <h2 className="display text-[clamp(2rem,4.6vw,3.75rem)] text-ink" data-mut={mutKey}>{title}</h2>
             </div>

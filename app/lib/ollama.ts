@@ -266,6 +266,36 @@ export async function ollamaStream(req: OllamaStreamRequest): Promise<ReadableSt
   });
 }
 
+/** A plain-text reply (no JSON), reasoning stripped. */
+export async function ollamaText(req: { system: string; user: string; temperature?: number; numPredict?: number; timeoutMs?: number }): Promise<{ text: string; model: string }> {
+  const apiKey = process.env.OLLAMA_API_KEY;
+  if (!apiKey) throw new Error("OLLAMA_API_KEY is not set");
+  const model = modelName();
+  const res = await fetch("https://ollama.com/api/chat", {
+    method: "POST",
+    headers: { Authorization: "Bearer " + apiKey, "Content-Type": "application/json" },
+    body: JSON.stringify({
+      model,
+      stream: false,
+      think: "low",
+      keep_alive: "10m",
+      options: { temperature: req.temperature ?? 0.8, num_predict: req.numPredict ?? 3000 },
+      messages: [
+        { role: "system", content: req.system },
+        { role: "user", content: req.user },
+      ],
+    }),
+    signal: AbortSignal.timeout(req.timeoutMs ?? 55000),
+  });
+  if (!res.ok) throw new Error("ollama " + res.status);
+  const data = (await res.json()) as ChatResponse;
+  if (data.error) throw new Error("ollama: " + data.error);
+  let text = data.message?.content ?? "";
+  const close = text.lastIndexOf("</think>");
+  if (close >= 0) text = text.slice(close + "</think>".length);
+  return { text: text.trim(), model };
+}
+
 export function textStreamResponse(stream: ReadableStream<Uint8Array>): Response {
   return new Response(stream, {
     headers: { "Content-Type": "text/plain; charset=utf-8", "Cache-Control": "no-store", "X-Accel-Buffering": "no" },

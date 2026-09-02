@@ -22,13 +22,13 @@ export function Journey() {
         aria-hidden
       />
       {JOURNEY.map((stop, i) => (
-        <Stop key={stop.when + stop.title} stop={stop} last={i === JOURNEY.length - 1} />
+        <Stop key={stop.when + stop.title} stop={stop} last={i === JOURNEY.length - 1} index={i} />
       ))}
     </ol>
   );
 }
 
-function Stop({ stop, last }: { stop: (typeof JOURNEY)[number]; last: boolean }) {
+function Stop({ stop, last, index }: { stop: (typeof JOURNEY)[number]; last: boolean; index: number }) {
   return (
     <motion.li
       className="relative grid sm:grid-cols-[9rem_1fr] gap-x-6 pl-8 sm:pl-0 pb-10"
@@ -43,11 +43,11 @@ function Stop({ stop, last }: { stop: (typeof JOURNEY)[number]; last: boolean })
         }`}
         aria-hidden
       />
-      <span className="font-mono text-[12px] text-ink-mute pt-1 sm:text-right sm:pr-8">{stop.when}</span>
+      <span className="font-mono text-[12px] text-ink-mute pt-1 sm:text-right sm:pr-8" data-mut={`path-${index}-when`}>{stop.when}</span>
       <div>
-        <h3 className="font-medium text-xl text-ink leading-tight tracking-tight">{stop.title}</h3>
-        <p className="text-[13px] font-mono text-loop mt-1">{stop.org}</p>
-        <p className="text-ink-dim mt-2 max-w-md leading-relaxed">{stop.note}</p>
+        <h3 className="font-medium text-xl text-ink leading-tight tracking-tight" data-mut={`path-${index}-title`}>{stop.title}</h3>
+        <p className="text-[13px] font-mono text-loop mt-1" data-mut={`path-${index}-org`}>{stop.org}</p>
+        <p className="text-ink-dim mt-2 max-w-md leading-relaxed" data-mut={`path-${index}-note`}>{stop.note}</p>
       </div>
     </motion.li>
   );

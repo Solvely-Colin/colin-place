@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { PortraitFx, type Treatment } from "./portrait";
 
 // The site goes wrong the longer you stay, one Lovecraft story per band.
 // Sanity starts at 100 and falls. Crossing a band asks the model for that
@@ -41,6 +42,7 @@ interface Whisper {
   last?: string;
   scene?: Scene;
   document?: FoundDocument;
+  portrait?: { treatment: Treatment; strength: number; caption: string };
 }
 interface Note {
   id: number;
@@ -177,6 +179,7 @@ export function Wrongness({ ready }: { ready: boolean }) {
   const [doc, setDoc] = useState<FoundDocument | null>(null);
   const [docOpen, setDocOpen] = useState(false);
   const [final, setFinal] = useState<string | null>(null);
+  const [atZero, setAtZero] = useState(false);
   const [typed, setTyped] = useState("");
   const [hold, setHold] = useState(0);
   const [facing, setFacing] = useState<1 | -1>(1);
@@ -204,11 +207,16 @@ export function Wrongness({ ready }: { ready: boolean }) {
     visits: 1,
     doorsClosed: 0,
     stopped: false,
+    atZero: false,
     lastNoteAt: 0,
     lastGlitchAt: 0,
     scene: null as Scene | null,
     navOrder: null as HTMLElement[] | null,
     sound: false,
+    nonce: "",
+    portrait: null as PortraitFx | null,
+    generation: 0,
+    prefetched: new Set<number>(),
   });
 
   // ----------------------------------------------------------------- reset
@@ -229,10 +237,16 @@ export function Wrongness({ ready }: { ready: boolean }) {
     e.maxScroll = 0;
     e.started = performance.now();
     e.scene = null;
+    e.atZero = false;
+    e.generation += 1;
+    e.prefetched.clear();
+    e.whispers.clear();
+    setAtZero(false);
     const root = document.documentElement;
     root.dataset.band = "0";
     for (const v of Array.from(root.style)) if (v.startsWith("--color-") || v.startsWith("--wr-")) root.style.removeProperty(v);
     drone.current?.stop();
+    e.portrait?.set(null, 0);
     setSound(false);
     setBand(0);
     setNotes([]);
@@ -267,6 +281,9 @@ export function Wrongness({ ready }: { ready: boolean }) {
     });
     const nav = document.querySelector("nav");
     if (nav) e.navOrder = Array.from(nav.querySelectorAll<HTMLElement>("a"));
+    e.nonce = Math.random().toString(36).slice(2, 10) + Date.now().toString(36).slice(-4);
+    const portraitImg = document.querySelector<HTMLImageElement>("img.portrait");
+    if (portraitImg) e.portrait = new PortraitFx(portraitImg);
     try {
       e.visits = Number(localStorage.getItem(VISITS_KEY) ?? "0") + 1;
       localStorage.setItem(VISITS_KEY, String(e.visits));
@@ -302,6 +319,8 @@ export function Wrongness({ ready }: { ready: boolean }) {
         visits: e.visits <= 1 ? "first" : e.visits <= 3 ? "returning" : "many",
         hovered: e.hovers,
         idle: performance.now() - e.lastMove > 15000,
+        nonce: e.nonce,
+        copy: Object.fromEntries(e.originals),
       };
     };
 
@@ -341,7 +360,8 @@ export function Wrongness({ ready }: { ready: boolean }) {
     };
 
     const apply = async (w: Whisper, b: number) => {
-      if (e.stopped || e.band !== b) return;
+      const gen = e.generation;
+      if (e.stopped || b > e.band) return;
       applyScene(w.scene, b);
       document.title = w.title;
       setWatcher(w.watcher);
@@ -350,22 +370,40 @@ export function Wrongness({ ready }: { ready: boolean }) {
       if (w.document) {
         const d = w.document;
         window.setTimeout(() => {
-          if (e.band === b && !e.stopped) {
+          if (e.generation === gen && !e.stopped) {
             setDoc(d);
             setDocOpen(true);
           }
         }, 9000);
       }
       if (b >= 3) shuffleNav();
-      const keys = Object.keys(w.rewrites);
-      for (const key of keys) {
-        if (e.stopped || e.band !== b) return;
-        const text = w.rewrites[key];
-        if (e.applied.get(key) === text) continue;
-        const els = document.querySelectorAll<HTMLElement>(`[data-mut="${key}"]`);
-        await Promise.all(Array.from(els).map((el) => scramble(el, text)));
-        e.applied.set(key, text);
-        await new Promise((r) => setTimeout(r, 700 + Math.random() * 1200));
+      if (w.portrait && e.portrait) {
+        e.portrait.set({ treatment: w.portrait.treatment, strength: w.portrait.strength }, b === 2 ? 0.55 : b === 3 ? 0.8 : 1);
+        if (w.portrait.caption) w.rewrites["portrait-caption"] = w.portrait.caption;
+      }
+      // Visible things first, then the rest, a few at a time.
+      const keys = Object.keys(w.rewrites).sort((a, c) => {
+        const ra = document.querySelector(`[data-mut="${a}"]`)?.getBoundingClientRect();
+        const rc = document.querySelector(`[data-mut="${c}"]`)?.getBoundingClientRect();
+        const va = ra ? Math.abs(ra.top - window.innerHeight / 2) : 1e9;
+        const vc = rc ? Math.abs(rc.top - window.innerHeight / 2) : 1e9;
+        return va - vc;
+      });
+      const batch = b >= 4 ? 6 : b === 3 ? 4 : 1;
+      for (let i = 0; i < keys.length; i += batch) {
+        // A newer band may have started; keep going unless the page was reset.
+        if (e.stopped || e.generation !== gen) return;
+        const slice = keys.slice(i, i + batch);
+        await Promise.all(
+          slice.map(async (key) => {
+            const text = w.rewrites[key];
+            if (e.applied.get(key) === text) return;
+            const els = document.querySelectorAll<HTMLElement>(`[data-mut="${key}"]`);
+            await Promise.all(Array.from(els).map((el) => scramble(el, text)));
+            e.applied.set(key, text);
+          })
+        );
+        await new Promise((r) => setTimeout(r, b >= 3 ? 250 + Math.random() * 400 : 500 + Math.random() * 900));
       }
       if (b >= 3) {
         document.querySelectorAll<HTMLElement>("[data-section-index]").forEach((el, i) => {
@@ -374,9 +412,9 @@ export function Wrongness({ ready }: { ready: boolean }) {
       }
     };
 
-    const fetchBand = async (b: number) => {
+    const fetchBand = async (b: number, applyNow = true) => {
       if (e.whispers.has(b)) {
-        void apply(e.whispers.get(b)!, b);
+        if (applyNow) void apply(e.whispers.get(b)!, b);
         return;
       }
       if (e.fetching.has(b)) return;
@@ -386,7 +424,8 @@ export function Wrongness({ ready }: { ready: boolean }) {
         if (!res.ok) return;
         const data = (await res.json()) as { whisper: Whisper };
         e.whispers.set(b, data.whisper);
-        void apply(data.whisper, b);
+        // Apply if we have reached this band by the time it arrives.
+        if (e.band >= b) void apply(data.whisper, b);
       } catch {
         // The page stays as it is.
       } finally {
@@ -415,7 +454,7 @@ export function Wrongness({ ready }: { ready: boolean }) {
           decay += m === 99 ? 4 : 2;
         }
       }
-      e.sanity = Math.max(0, e.sanity - decay);
+      e.sanity = e.atZero ? 0 : Math.max(0, e.sanity - decay);
       const b = bandOf(e.sanity);
       const wr = window.__wrongness;
       if (wr) {
@@ -433,6 +472,11 @@ export function Wrongness({ ready }: { ready: boolean }) {
         document.documentElement.dataset.band = String(b);
         setBand(b);
         if (b >= 1) void fetchBand(b);
+      }
+      const nextThreshold = [80, 60, 40, 20][b];
+      if (nextThreshold !== undefined && e.sanity - nextThreshold < 8 && !e.prefetched.has(b + 1)) {
+        e.prefetched.add(b + 1);
+        void fetchBand(b + 1, false);
       }
       const gap = b >= 4 ? 7000 : b === 3 ? 11000 : 16000;
       if (b >= 1 && e.noteQueue.length > 0 && now - e.lastNoteAt > gap) {
@@ -459,10 +503,10 @@ export function Wrongness({ ready }: { ready: boolean }) {
         if (b >= 3 && Math.random() < (b === 4 ? 0.5 : 0.3)) d.scratch(b === 4 ? 1 : 0.6);
         if (b >= 4 && Math.random() < 0.25) d.pulse();
       }
-      if (e.sanity <= 0 && !e.stopped) {
-        e.stopped = true;
+      if (e.sanity <= 0 && !e.atZero) {
+        e.atZero = true;
         const w = e.whispers.get(4);
-        setDocOpen(false);
+        setAtZero(true);
         setFinal(w?.last ?? "you stayed long enough for the page to learn the shape of you. the sleeper turned over. close the door, and it forgets. it always forgets.");
       }
     }, 1000);
@@ -472,6 +516,7 @@ export function Wrongness({ ready }: { ready: boolean }) {
       window.removeEventListener("pointermove", onMove);
       window.removeEventListener("scroll", onScroll);
       drone.current?.stop();
+      e.portrait?.destroy();
     };
   }, []);
 
@@ -483,7 +528,12 @@ export function Wrongness({ ready }: { ready: boolean }) {
       setTyped(final.slice(0, i));
       if (i >= final.length) window.clearInterval(id);
     }, 45);
-    return () => window.clearInterval(id);
+    // The moment passes; the page stays at the bottom, and you may keep walking.
+    const dissolve = window.setTimeout(() => setFinal(null), 45 * final.length + 9000);
+    return () => {
+      window.clearInterval(id);
+      window.clearTimeout(dissolve);
+    };
   }, [final]);
 
   useEffect(() => {
@@ -532,6 +582,7 @@ export function Wrongness({ ready }: { ready: boolean }) {
       const scene = engine.current.scene;
       const root = document.documentElement;
       const deep = Math.max(0, Math.min(1, (60 - s) / 60));
+      const zero = window.__wrongness ? window.__wrongness.sanity <= 0 : false;
       ctx.clearRect(0, 0, w, h);
       if (final) {
         ctx.fillStyle = "rgba(3,16,14,1)";
@@ -548,7 +599,7 @@ export function Wrongness({ ready }: { ready: boolean }) {
         return;
       }
       const m = scene.motion;
-      const bandGain = b === 2 ? 0.4 : b === 3 ? 0.7 : 1;
+      const bandGain = b === 2 ? 0.4 : b === 3 ? 0.7 : zero ? 1.25 : 1;
       const accentRgb = hexRgb(scene.palette.accent);
       let dx = 0;
       let dy = 0;
@@ -787,7 +838,6 @@ export function Wrongness({ ready }: { ready: boolean }) {
           // ignore
         }
         engine.current.doorsClosed += 1;
-        engine.current.stopped = false;
         restore();
         window.scrollTo({ top: 0, behavior: "smooth" });
         return;
@@ -884,7 +934,20 @@ export function Wrongness({ ready }: { ready: boolean }) {
 
       {/* Controls, once things have started */}
       {band >= 2 && !final && (
-        <div className="fixed z-[170] bottom-4 left-4 sm:bottom-6 sm:left-6 flex items-center gap-4 font-mono text-[10px] text-ink-mute">
+        <div className="fixed z-[170] bottom-4 left-4 sm:bottom-6 sm:left-6 flex flex-wrap items-center gap-4 font-mono text-[10px] text-ink-mute">
+          {atZero && (
+            <button
+              type="button"
+              onPointerDown={startHold}
+              onPointerUp={endHold}
+              onPointerLeave={endHold}
+              onPointerCancel={endHold}
+              className="relative h-8 px-3 rounded-md border border-loop text-loop overflow-hidden select-none text-[11px]"
+            >
+              <span className="absolute inset-y-0 left-0 bg-loop/25" style={{ width: `${hold * 100}%` }} />
+              <span className="relative">hold to close the door</span>
+            </button>
+          )}
           <button
             type="button"
             onClick={() => {
@@ -922,18 +985,23 @@ export function Wrongness({ ready }: { ready: boolean }) {
           <p className="max-w-[52ch] font-mono text-[11px] leading-relaxed mt-8" style={{ color: "#4f8268" }}>
             {INNSMOUTH}
           </p>
-          <button
-            type="button"
-            onPointerDown={startHold}
-            onPointerUp={endHold}
-            onPointerLeave={endHold}
-            onPointerCancel={endHold}
-            className="relative mt-10 h-12 px-6 rounded-md border font-medium text-sm overflow-hidden select-none"
-            style={{ borderColor: "#1f5a44", color: "#bfe3d0" }}
-          >
-            <span className="absolute inset-y-0 left-0" style={{ width: `${hold * 100}%`, background: "#5cf2c8", opacity: 0.25 }} />
-            <span className="relative">hold to close the door</span>
-          </button>
+          <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
+            <button
+              type="button"
+              onPointerDown={startHold}
+              onPointerUp={endHold}
+              onPointerLeave={endHold}
+              onPointerCancel={endHold}
+              className="relative h-12 px-6 rounded-md border font-medium text-sm overflow-hidden select-none"
+              style={{ borderColor: "#1f5a44", color: "#bfe3d0" }}
+            >
+              <span className="absolute inset-y-0 left-0" style={{ width: `${hold * 100}%`, background: "#5cf2c8", opacity: 0.25 }} />
+              <span className="relative">hold to close the door</span>
+            </button>
+            <button type="button" onClick={() => setFinal(null)} className="h-12 px-6 rounded-md text-sm font-medium" style={{ color: "#7fb79b" }}>
+              keep walking
+            </button>
+          </div>
           <button type="button" onClick={() => setExplain((v) => !v)} className="mt-6 font-mono text-[11px] underline underline-offset-2" style={{ color: "#4f8268" }}>
             what is this?
           </button>

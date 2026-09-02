@@ -48,6 +48,7 @@ export function Nav() {
               key={l.href}
               href={l.href}
               className="hidden sm:inline-block px-3 py-1.5 text-[14px] text-ink-mute hover:text-ink transition"
+              data-mut={`nav-${l.label.toLowerCase()}`}
             >
               {l.label}
             </a>

@@ -67,7 +67,7 @@ function RepoTile({ repo }: { repo: RepoCard }) {
           )}
         </span>
       </div>
-      <p className="text-[14px] text-ink-dim mt-2 leading-relaxed line-clamp-2">
+      <p className="text-[14px] text-ink-dim mt-2 leading-relaxed line-clamp-2" data-mut={`repo-${repo.name.toLowerCase().replace(/[^a-z0-9]+/g, "-")}-desc`}>
         {repo.description ?? "Fresh from the Solvely lab."}
       </p>
       <p className="font-mono text-[11px] text-ink-mute mt-4">
@@ -116,11 +116,11 @@ export default async function Home() {
           <div className="relative z-10 pointer-events-none mx-auto max-w-[1400px] w-full px-5 sm:px-8 pt-28 pb-10 sm:pb-14">
             <Reveal>
               <p className="eyebrow mb-5 flex flex-wrap items-center gap-x-3 gap-y-1">
-                <span className="text-ink-dim">Colin Johnson</span>
+                <span className="text-ink-dim" data-mut="hero-name">Colin Johnson</span>
                 <span>·</span>
-                <span>Mishawaka, Indiana</span>
+                <span data-mut="hero-place">Mishawaka, Indiana</span>
                 <span>·</span>
-                <span className="text-loop flex items-center gap-2"><span className="live-dot" /> live</span>
+                <span className="text-loop flex items-center gap-2"><span className="live-dot" /> <span data-mut="hero-live">live</span></span>
               </p>
             </Reveal>
 
@@ -146,29 +146,29 @@ export default async function Home() {
                   href="#about"
                   className="group inline-flex items-center gap-2 h-10 px-4 rounded-md bg-ink text-ground font-medium text-sm hover:bg-ink-dim transition"
                 >
-                  About me
+                  <span data-mut="cta-about">About me</span>
                   <ArrowDown className="w-4 h-4 transition-transform group-hover:translate-y-0.5" />
                 </a>
                 <a
                   href="#contact"
                   className="inline-flex items-center gap-2 h-10 px-4 rounded-md border border-line-strong bg-ground-2 text-ink text-sm font-medium hover:border-ink transition"
                 >
-                  Say hi
+                  <span data-mut="cta-hi">Say hi</span>
                 </a>
               </Reveal>
             </div>
 
             <Reveal delay={0.3}>
               <div className="pointer-events-auto mt-12 flex flex-wrap items-end gap-x-10 gap-y-5">
-                {liveStats.map((s) => (
+                {liveStats.map((s, i) => (
                   <div key={s.label}>
-                    <p className="font-mono text-2xl sm:text-3xl text-ink leading-none">{s.n}</p>
-                    <p className="eyebrow mt-1.5 !text-[10px]">{s.label}</p>
+                    <p className="font-mono text-2xl sm:text-3xl text-ink leading-none" data-mut={`stat-${i}-value`}>{s.n}</p>
+                    <p className="eyebrow mt-1.5 !text-[10px]" data-mut={`stat-${i}-label`}>{s.label}</p>
                   </div>
                 ))}
                 <div className="ml-auto text-right">
                   <p className="font-mono text-[11px] text-ink-mute">
-                    telemetry <TimeAgo iso={pulse.generatedAt} /> · last agent deploy {formatDate(lastDeploy.date)}
+                    <span data-mut="telemetry-label">telemetry</span> <TimeAgo iso={pulse.generatedAt} /> · <span data-mut="deploy-label">last agent deploy</span> {formatDate(lastDeploy.date)}
                   </p>
                   <Presence className="font-mono text-[11px] text-ink-dim mt-1 inline-block" />
                 </div>
@@ -216,22 +216,22 @@ export default async function Home() {
                   className="portrait w-full h-full object-cover"
                 />
               </div>
-              <p className="eyebrow mt-3">feeling loopy · the hat is real, so is the loop above</p>
+              <p className="eyebrow mt-3" data-mut="portrait-caption">feeling loopy · the hat is real, so is the loop above</p>
             </Reveal>
 
             <Stagger className="grid sm:grid-cols-2 gap-3">
-              {NOW_ITEMS.map((item) => (
+              {NOW_ITEMS.map((item, i) => (
                 <Item key={item.title}>
                   <TiltCard href={item.href} external={!!item.href && !item.href.startsWith("#")} className="p-5 h-full" max={4}>
-                    <h3 className="font-medium text-lg text-ink leading-snug tracking-tight">{item.title}</h3>
-                    <p className="text-[14px] text-ink-dim mt-2 leading-relaxed">{item.detail}</p>
+                    <h3 className="font-medium text-lg text-ink leading-snug tracking-tight" data-mut={`now-${i}-title`}>{item.title}</h3>
+                    <p className="text-[14px] text-ink-dim mt-2 leading-relaxed" data-mut={`now-${i}-detail`}>{item.detail}</p>
                   </TiltCard>
                 </Item>
               ))}
               {pulse.shepherding.length > 0 && (
                 <Item className="sm:col-span-2">
                   <div className="p-5 rounded-lg border border-line bg-ground-2">
-                    <p className="eyebrow mb-2">Repos he pushed to this week</p>
+                    <p className="eyebrow mb-2" data-mut="shepherd-label">Repos he pushed to this week</p>
                     <p className="text-ink-dim leading-relaxed">
                       {pulse.shepherding.map((repo, i) => (
                         <span key={repo.name}>
@@ -270,17 +270,17 @@ export default async function Home() {
           blurb="Each one links to the public page it comes from. If GitHub disagrees, GitHub wins."
         >
           <Stagger className="grid sm:grid-cols-2 lg:grid-cols-3 gap-px bg-line rounded-lg overflow-hidden border border-line">
-            {BIG_NUMBERS.map((n) => {
+            {BIG_NUMBERS.map((n, i) => {
               const inner = (
                 <>
                   <p className="display text-[clamp(3rem,6vw,5rem)] text-ink leading-none">
-                    <CountUp to={n.value} suffix={n.suffix} />
+                    <CountUp to={n.value} suffix={n.suffix} mutKey={`num-${i}-value`} />
                   </p>
-                  <p className="font-medium text-lg text-ink mt-4 tracking-tight">{n.label}</p>
-                  <p className="text-[14px] text-ink-dim mt-1 leading-relaxed">{n.note}</p>
+                  <p className="font-medium text-lg text-ink mt-4 tracking-tight" data-mut={`num-${i}-label`}>{n.label}</p>
+                  <p className="text-[14px] text-ink-dim mt-1 leading-relaxed" data-mut={`num-${i}-note`}>{n.note}</p>
                   {n.href && (
                     <span className="inline-flex items-center gap-1 font-mono text-[11px] text-ink-mute group-hover:text-loop mt-4 transition">
-                      receipt <ArrowUpRight className="w-3 h-3" />
+                      <span data-mut={`num-${i}-receipt`}>receipt</span> <ArrowUpRight className="w-3 h-3" />
                     </span>
                   )}
                 </>
@@ -299,7 +299,7 @@ export default async function Home() {
             })}
             <Item className="bg-ground">
               <div className="p-7 sm:p-9 h-full flex flex-col">
-                <p className="eyebrow mb-4">Ships in</p>
+                <p className="eyebrow mb-4" data-mut="ships-in">Ships in</p>
                 <div className="flex flex-wrap gap-2">
                   {STACK.map((s) => (
                     <span key={s} className="px-2 py-1 rounded border border-line font-mono text-[11px] text-ink-mute">
@@ -309,7 +309,7 @@ export default async function Home() {
                 </div>
                 {pulse.languages.length > 0 && (
                   <div className="mt-auto pt-6">
-                    <p className="eyebrow mb-2 !text-[10px]">language mix, last 180 days</p>
+                    <p className="eyebrow mb-2 !text-[10px]" data-mut="lang-label">language mix, last 180 days</p>
                     <div className="flex h-1.5 rounded-full overflow-hidden bg-line">
                       {pulse.languages.map((l) => (
                         <span
@@ -344,17 +344,17 @@ export default async function Home() {
           blurb="Find the friction developers keep hitting, turn it into issues, docs, and fixes, and prove the fix with something a reviewer can re-run."
         >
           <Stagger className="grid md:grid-cols-2 gap-4">
-            {ECOSYSTEMS.map((eco) => (
+            {ECOSYSTEMS.map((eco, i) => (
               <Item key={eco.name}>
                 <TiltCard href={eco.href} external className="p-6 sm:p-8 h-full">
                   <div className="flex items-start justify-between gap-4">
                     <div>
-                      <p className="eyebrow !text-loop mb-2">{eco.role}</p>
-                      <h3 className="display text-2xl sm:text-3xl text-ink">{eco.name}</h3>
+                      <p className="eyebrow !text-loop mb-2" data-mut={`eco-${i}-role`}>{eco.role}</p>
+                      <h3 className="display text-2xl sm:text-3xl text-ink" data-mut={`eco-${i}-name`}>{eco.name}</h3>
                     </div>
                     <ArrowUpRight className="w-5 h-5 text-ink-mute shrink-0 mt-1" />
                   </div>
-                  <p className="text-ink-dim mt-5 leading-relaxed">{eco.blurb}</p>
+                  <p className="text-ink-dim mt-5 leading-relaxed" data-mut={`eco-${i}-blurb`}>{eco.blurb}</p>
                   <div className="flex flex-wrap gap-1.5 mt-6">
                     {eco.tags.map((t) => (
                       <span key={t} className="px-2 py-0.5 rounded border border-line font-mono text-[11px] text-ink-mute">
@@ -370,8 +370,8 @@ export default async function Home() {
           <div className="mt-14">
             <Reveal>
               <div className="flex items-baseline justify-between gap-4 mb-5">
-                <h3 className="font-medium text-xl text-ink tracking-tight">From the lab</h3>
-                <p className="font-mono text-[11px] text-ink-mute">
+                <h3 className="font-medium text-xl text-ink tracking-tight" data-mut="lab-title">From the lab</h3>
+                <p className="font-mono text-[11px] text-ink-mute" data-mut="lab-note">
                   {repos.fallback ? "snapshot · GitHub unreachable" : "pulled live from GitHub"}
                 </p>
               </div>
@@ -387,7 +387,7 @@ export default async function Home() {
               <>
                 <Reveal>
                   <p className="eyebrow mt-8 mb-3 flex items-center gap-2">
-                    <GitFork className="w-3.5 h-3.5" /> forks he hacks on
+                    <GitFork className="w-3.5 h-3.5" /> <span data-mut="forks-label">forks he hacks on</span>
                   </p>
                 </Reveal>
                 <Stagger className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
@@ -428,15 +428,15 @@ export default async function Home() {
         >
           <div className="grid lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] gap-10 lg:gap-16">
             <Reveal>
-              <p className="text-[clamp(1.35rem,2.4vw,1.9rem)] font-medium tracking-tight leading-snug text-ink max-w-[30ch]">
+              <p className="text-[clamp(1.35rem,2.4vw,1.9rem)] font-medium tracking-tight leading-snug text-ink max-w-[30ch]" data-mut="about-lede">
                 {about.record.narrative.lede}
               </p>
               <div className="mt-7 space-y-5 text-ink-dim leading-relaxed max-w-[62ch]">
                 {about.record.narrative.paragraphs.map((p, i) => (
-                  <p key={i}>{p}</p>
+                  <p key={i} data-mut={`about-${i}`}>{p}</p>
                 ))}
               </div>
-              <p className="mt-6 font-mono text-[11px] text-ink-mute">
+              <p className="mt-6 font-mono text-[11px] text-ink-mute" data-mut="about-reason">
                 Last rewrite: {about.record.narrative.reason}
               </p>
             </Reveal>
@@ -444,8 +444,8 @@ export default async function Home() {
             <div>
               <Reveal>
                 <div className="flex items-baseline justify-between mb-3">
-                  <h3 className="font-medium text-xl text-ink tracking-tight">Open right now</h3>
-                  <span className="font-mono text-[11px] text-ink-mute">{pulse.openPrs.length} open</span>
+                  <h3 className="font-medium text-xl text-ink tracking-tight" data-mut="prs-title">Open right now</h3>
+                  <span className="font-mono text-[11px] text-ink-mute" data-mut="prs-count">{pulse.openPrs.length} open</span>
                 </div>
               </Reveal>
               {pulse.openPrs.length === 0 ? (
@@ -480,9 +480,9 @@ export default async function Home() {
 
               {about.record.narrative.highlights.length > 0 && (
                 <Reveal className="mt-10">
-                  <h3 className="font-medium text-xl text-ink tracking-tight mb-3">Worth a look</h3>
+                  <h3 className="font-medium text-xl text-ink tracking-tight mb-3" data-mut="highlights-title">Worth a look</h3>
                   <div className="grid gap-2">
-                    {about.record.narrative.highlights.map((h) => (
+                    {about.record.narrative.highlights.map((h, i) => (
                       <a
                         key={h.url + h.title}
                         href={h.url}
@@ -491,8 +491,8 @@ export default async function Home() {
                         className="spot group flex items-center gap-4 p-4 rounded-lg border border-line bg-ground-2 transition"
                       >
                         <span className="min-w-0">
-                          <span className="block text-[14px] font-medium text-ink group-hover:text-loop transition">{h.title}</span>
-                          <span className="block text-[13px] text-ink-dim mt-0.5">{h.detail}</span>
+                          <span className="block text-[14px] font-medium text-ink group-hover:text-loop transition" data-mut={`hl-${i}-title`}>{h.title}</span>
+                          <span className="block text-[13px] text-ink-dim mt-0.5" data-mut={`hl-${i}-detail`}>{h.detail}</span>
                         </span>
                         <ArrowUpRight className="w-4 h-4 ml-auto shrink-0 text-ink-mute group-hover:text-loop transition" />
                       </a>
@@ -530,7 +530,7 @@ export default async function Home() {
           <div className="relative mx-auto max-w-[1400px] px-5 sm:px-8">
             <Reveal>
               <p className="eyebrow mb-5">
-                <span className="text-loop" data-section-index="06">06</span> / Contact
+                <span className="text-loop" data-section-index="06">06</span> / <span data-mut="kicker-contact">Contact</span>
               </p>
               <h2 className="display text-[clamp(2.4rem,6vw,5rem)] text-ink" data-mut="contact">
                 Let&apos;s build something.
@@ -559,7 +559,7 @@ export default async function Home() {
                     className="spot group flex items-center justify-between p-5 rounded-lg border border-line bg-ground-2 transition"
                   >
                     <span>
-                      <span className="eyebrow block">{link.label}</span>
+                      <span className="eyebrow block" data-mut={`contact-${link.label.toLowerCase().replace(/[^a-z]+/g, "-")}-label`}>{link.label}</span>
                       <span className="block text-ink mt-1 group-hover:text-loop transition">{link.value}</span>
                     </span>
                     <ArrowUpRight className="w-4 h-4 text-ink-mute group-hover:text-loop transition" />
@@ -578,11 +578,11 @@ export default async function Home() {
                 Every pixel of this page, including this sentence, was planned, written, and deployed by
                 agent sessions, with Colin approving what ships.
               </span>{" "}
-              The latest of those deploys:{" "}
+              <span data-mut="footer-deploys">The latest of those deploys:</span>{" "}
               <span className="text-ink-dim">&ldquo;{lastDeploy.title}&rdquo;</span>.
             </p>
             <p className="font-mono text-[11px] text-ink-mute sm:text-right">
-              colin.place · live from GitHub · {new Date().getFullYear()}
+              <span data-mut="footer-tag">colin.place · live from GitHub</span> · {new Date().getFullYear()}
             </p>
           </div>
         </footer>

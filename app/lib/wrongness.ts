@@ -1,6 +1,6 @@
 import type { FeedItem } from "./activity";
 import { kvGet, kvSet } from "./kv";
-import { ollamaJson, ollamaReady } from "./ollama";
+import { ollamaJson, ollamaReady, ollamaText } from "./ollama";
 
 // The site goes wrong the longer you stay. A model writes the wrongness:
 // small rewrites of on-page copy, notes in the margin that know what the
@@ -62,6 +62,16 @@ export interface FoundDocument {
   body: string[];
 }
 
+export const TREATMENTS = ["grey", "channelshift", "pixelsort", "melt", "double", "drown", "static", "negative", "eyes"] as const;
+export type Treatment = (typeof TREATMENTS)[number];
+
+// The model directs the portrait: a treatment the page renders on canvas.
+export interface Portrait {
+  treatment: Treatment;
+  strength: number;
+  caption: string;
+}
+
 export interface Whisper {
   marginalia: string[];
   rewrites: Record<string, string>;
@@ -70,7 +80,11 @@ export interface Whisper {
   last?: string;
   scene?: Scene;
   document?: FoundDocument;
+  portrait?: Portrait;
 }
+
+/** Copy the client offers for rewriting: key -> current text. */
+export type Copy = Record<string, string>;
 
 const SCHEMA = {
   type: "object",
@@ -84,6 +98,16 @@ const SCHEMA = {
     title: { type: "string", description: "the browser tab title, max 40 chars" },
     watcher: { type: "string", description: "one line the figure in the corner says, max 120 chars" },
     last: { type: "string", description: "band 4 only: one calm sentence shown alone on the screen, max 160 chars" },
+    portrait: {
+      type: "object",
+      description: "bands 2-4: how the photograph of Colin is treated",
+      properties: {
+        treatment: { type: "string", enum: [...TREATMENTS] },
+        strength: { type: "number", minimum: 0, maximum: 1 },
+        caption: { type: "string", description: "the caption under the photo, max 90 chars, in the band's register" },
+      },
+      required: ["treatment", "strength", "caption"],
+    },
     document: {
       type: "object",
       description: "a found document in the story's framing device for this band",
@@ -138,8 +162,34 @@ const SCHEMA = {
       required: ["palette", "effects", "motion"],
     },
   },
-  required: ["marginalia", "rewrites", "title", "watcher"],
+  required: ["marginalia", "title", "watcher"],
 } as const;
+
+const REWRITE_SYSTEM = `You rewrite the copy of colin.place for a given band of the wrongness described in the dossier. You get the page's copy as "key: text" lines. Reply with rewrites ONLY, one per line, in exactly this form:
+
+key ::: new text
+
+No JSON, no quotes around the text, no commentary, no blank lines, no markdown. Only keys from the list. Keys ending in "-name" must not appear. Everything else follows the dossier's rules for the band: how many keys, how the stats may go wrong at bands 3-4, facts about Colin unchanged, Blake's fragment style at band 4. Be different from any other visit: you are given a nonce.`;
+
+function parseRewriteLines(text: string, copy: Copy, band: number): Record<string, string> {
+  const out: Record<string, string> = {};
+  for (const raw of text.split("\n")) {
+    const line = raw.trim();
+    const sep = line.indexOf(":::");
+    if (sep <= 0) continue;
+    const key = line.slice(0, sep).trim().replace(/^[-*\d.\s"']+/, "").replace(/["']+$/, "");
+    let value = line.slice(sep + 3).trim().replace(/^["']|["']$/g, "").replace(/\s+/g, " ");
+    const original = copy[key];
+    if (original === undefined || !value || key.endsWith("-name")) continue;
+    const isStat = key.startsWith("stat-") || key.startsWith("num-");
+    if (isStat && band < 3 && /value/.test(key)) continue;
+    const maxLen = isStat && /value/.test(key) ? 14 : Math.max(24, original.length * (band >= 3 ? 1.9 : 1.5) + 12);
+    if (value.length > maxLen) value = value.slice(0, maxLen);
+    if (!isStat && value.length < Math.min(original.length * 0.5, 12)) continue;
+    out[key] = value;
+  }
+  return out;
+}
 
 const SYSTEM = `You write the slow wrongness of colin.place, Colin Johnson's personal site. The site starts clean and precise. The longer someone stays, the lower their sanity, and you stage what happens at a given band. This is Lovecraft, and Lovecraft is not a colour: it is EVENTS told through FOUND DOCUMENTS. Each band follows one story from the dossier. Stage its events on the page; do not merely describe a mood.
 
@@ -155,12 +205,18 @@ Register: quiet, plain, reverent, wrong. Never gore, never threats, never exclam
 Hard rules:
 - Every fact about Colin stays true. You may change tone, add clauses, repeat, address the reader, braid in R'lyehian, but never change names, numbers, employers, or projects, and never invent new ones.
 - Rewrites stay recognisable; within about 25 percent of the original length at bands 1-2, up to 70 percent longer at bands 3-4. At band 4 use Blake's fragment style.
-- Use only the keys you are given. Band 1 exactly one rewrite, band 2 two or three, band 3 six or seven (including the section titles now, numbers, work, about, path as roman-numeral parts), band 4 EVERY key, all fourteen. Keep every string valid JSON: escape double quotes inside strings, no raw newlines.
+- You are given the page's copy as key: text pairs. Anything on the list may be rewritten; return the key exactly. Band 1: one or two keys. Band 2: five to eight, mostly the hero and captions. Band 3: fifteen to twenty-five across the whole page, including the section titles as roman-numeral parts of a case (now, numbers, work, about, path), card titles, the path's stops, nav links. Band 4: at least sixty percent of ALL keys; the whole page must feel wrong from the nav to the footer.
+- Stats (keys starting with "stat-" or "num-") are numbers with labels. Bands 1-2: leave the numbers alone. Band 3: a few may go wrong in a quiet way: a digit repeated, a count that went down, a number that is also a date, a label that says what the number costs. Band 4: most of them: "∞", "drained", roman numerals, R'lyehian, a number counted in the wrong direction. Keep each value under 14 characters.
+- Keys ending in "-name" are real project or organisation names; those stay exactly as they are. Everything else about them may be rewritten.
+- Every visit is different. You are given a nonce; write this visit's wrongness so that it does not repeat what another visit would get: different documents, different omens, different rewrites. Never reuse the example phrasing from this dossier verbatim as your own line.
+- Keep every string valid JSON: escape double quotes inside strings, no raw newlines.
 - Marginalia refer to what the reader is doing, using only the visitor facts given (how long, where on the page, time of day, first visit or returning, whether they hovered the loop, whether they went still), and to the band's story. Never guess anything else about them.
 - Use the real GitHub events as omens and as the dates in documents: a push at an odd hour, a pull request opened and not yet merged, a repo pushed to again. Quote them accurately.
 - The watcher is the small figure in the corner. Band 1 ordinary. Band 3 it may speak the Warren line. Band 4 it has the look.
 - The title is the browser tab. Band 1 "colin.place". Band 2 "colin.place (grey)". Band 3 "colin.place is here". Band 4 something in R'lyehian, under 40 characters.
 - "last" (band 4 only): one calm sentence shown alone on a black screen when sanity reaches zero, offering the reader the door.
+
+You also direct the photograph of Colin, at bands 2-4, as "portrait": choose a treatment from grey (the Colour's aftermath, going grey and brittle), channelshift (the image tearing into its colours), pixelsort (pixels sliding like sand), melt (the face running downward), double (a second Colin slightly behind the first), drown (under water, caustics moving over him), static (a broken signal), negative, eyes (the Innsmouth look, the eyes that do not shut). Band 2 grey or pixelsort, faint. Band 3 channelshift, double, melt, or eyes, unmistakable. Band 4 drown, eyes, negative, or melt, strong. Write the caption under the photo in the band's register.
 
 You also direct the picture, at bands 2-4, as "scene". You are choreographing a real web page:
 - palette: band 2 the Colour's aftermath, paper going grey and dusty, ink a cold dark grey, accent a hue that should not exist (choose a strange one). Band 3 the Witch House: violet mist, lilac-grey ground, deep violet-black ink, accent violet. Band 4 Innsmouth at night: near-black sea green ground, pale phosphorescent ink, one sick luminous accent. Ink must contrast strongly with ground.
@@ -366,7 +422,18 @@ function normalizeScene(raw: unknown, band: number): Scene | undefined {
   };
 }
 
-function normalize(raw: unknown, ctx: VisitorContext): Whisper | null {
+function normalizePortrait(raw: unknown, band: number): Portrait | undefined {
+  if (band < 2) return undefined;
+  const fb: Portrait = band === 2 ? { treatment: "grey", strength: 0.5, caption: "going grey at the edges, and brittle" } : band === 3 ? { treatment: "double", strength: 0.6, caption: "there are two of him in the room, and the angles do not agree" } : { treatment: "eyes", strength: 0.9, caption: "the look. the eyes do not shut. neither do yours" };
+  if (!raw || typeof raw !== "object") return fb;
+  const r = raw as Record<string, unknown>;
+  const treatment = typeof r.treatment === "string" && (TREATMENTS as readonly string[]).includes(r.treatment) ? (r.treatment as Treatment) : fb.treatment;
+  const strength = num(r.strength, 0, 1, fb.strength);
+  const caption = typeof r.caption === "string" ? r.caption.replace(/\s+/g, " ").trim().slice(0, 90) || fb.caption : fb.caption;
+  return { treatment, strength, caption };
+}
+
+function normalize(raw: unknown, ctx: VisitorContext, copy: Copy): Whisper | null {
   const r = (raw && typeof raw === "object" ? raw : {}) as Record<string, unknown>;
   const clean = (v: unknown, max: number) => (typeof v === "string" ? v.replace(/\s+/g, " ").trim().slice(0, max) : "");
   const marginalia = Array.isArray(r.marginalia) ? r.marginalia.map((m) => clean(m, 110)).filter(Boolean).slice(0, 4) : [];
@@ -374,73 +441,106 @@ function normalize(raw: unknown, ctx: VisitorContext): Whisper | null {
   if (Array.isArray(r.rewrites)) {
     for (const item of r.rewrites) {
       const o = (item && typeof item === "object" ? item : {}) as Record<string, unknown>;
-      const key = clean(o.key, 20);
-      const text = clean(o.text, 600);
-      const original = MUTABLE[key];
-      if (!original || !text) continue;
-      if (text.length < original.length * 0.6 || text.length > original.length * 1.5 + 12) continue;
+      const key = clean(o.key, 40);
+      const text = clean(o.text, 700);
+      const original = copy[key];
+      if (original === undefined || !text) continue;
+      if (key.endsWith("-name")) continue;
+      const isStat = key.startsWith("stat-") || key.startsWith("num-");
+      if (isStat && ctx.band < 3 && /value/.test(key)) continue;
+      const maxLen = isStat && /value/.test(key) ? 14 : Math.max(24, original.length * (ctx.band >= 3 ? 1.9 : 1.5) + 12);
+      if (text.length > maxLen) continue;
+      if (!isStat && text.length < Math.min(original.length * 0.5, 12)) continue;
       rewrites[key] = text;
     }
   }
-  if (marginalia.length < 2 || Object.keys(rewrites).length === 0) return null;
+  if (marginalia.length < 2) return null;
   const title = clean(r.title, 40) || "colin.place";
   const watcher = clean(r.watcher, 120) || fallback(ctx).watcher;
   const last = ctx.band >= 4 ? clean(r.last, 160) || fallback(ctx).last : undefined;
   const scene = ctx.band >= 2 ? normalizeScene(r.scene, ctx.band) : undefined;
   const document = normalizeDocument(r.document, ctx.band);
-  return { marginalia, rewrites, title, watcher, ...(last ? { last } : {}), ...(scene ? { scene } : {}), document };
+  const portrait = normalizePortrait(r.portrait, ctx.band);
+  return { marginalia, rewrites, title, watcher, ...(last ? { last } : {}), ...(scene ? { scene } : {}), document, ...(portrait ? { portrait } : {}) };
 }
 
-export function cacheKey(ctx: VisitorContext): string {
-  return ["whisper", "v3", ctx.band, ctx.time, ctx.scroll, ctx.hour, ctx.visits, ctx.hovered > 0 ? "h" : "n", ctx.idle ? "i" : "m"].join(":");
+function bandCacheKey(band: number): string {
+  return "whisper:v4:band:" + band;
 }
 
-export async function whisper(ctx: VisitorContext, events: FeedItem[], allowModel: boolean): Promise<{ whisper: Whisper; source: "model" | "cache" | "fallback"; reason?: string }> {
-  const key = cacheKey(ctx);
-  const cached = await kvGet<Whisper>(key);
-  if (cached) return { whisper: cached, source: "cache" };
-  if (!allowModel || !ollamaReady()) return { whisper: fallback(ctx), source: "fallback", reason: !ollamaReady() ? "no key" : "rate limited" };
-  const omens = events.slice(0, 12).map((e) => `- ${e.at.replace("T", " ").slice(0, 16)} UTC: ${e.text}`).join("\n");
-  const originals = Object.entries(MUTABLE)
+export async function whisper(
+  ctx: VisitorContext,
+  copy: Copy,
+  events: FeedItem[],
+  allowModel: boolean,
+  nonce: string
+): Promise<{ whisper: Whisper; source: "model" | "cache" | "fallback"; reason?: string }> {
+  const fromCache = async (reason: string) => {
+    const cached = await kvGet<Whisper>(bandCacheKey(ctx.band));
+    if (cached) {
+      // Only keep rewrites whose keys this page actually has.
+      cached.rewrites = Object.fromEntries(Object.entries(cached.rewrites).filter(([k]) => copy[k] !== undefined));
+      return { whisper: cached, source: "cache" as const, reason };
+    }
+    return { whisper: fallback(ctx), source: "fallback" as const, reason };
+  };
+  if (!allowModel || !ollamaReady()) return fromCache(!ollamaReady() ? "no key" : "rate limited");
+  const omens = events.slice(0, 14).map((e) => `- ${e.at.replace("T", " ").slice(0, 16)} UTC: ${e.text}`).join("\n");
+  const copyList = Object.entries(copy)
     .map(([k, v]) => `${k}: ${v}`)
     .join("\n");
   const user = [
     `BAND: ${ctx.band} of 4`,
+    `NONCE: ${nonce}`,
     `VISITOR: has been here ${ctx.time}; is near ${ctx.scroll} of the page; it is ${ctx.hour} for them; this is their ${ctx.visits} visit; hovered the loop ${ctx.hovered > 0 ? "yes" : "no"}; went still ${ctx.idle ? "yes" : "no"}.`,
     "REAL GITHUB EVENTS (newest first):",
     omens || "- none",
-    "COPY YOU MAY REWRITE (key: original):",
-    originals,
+    "PAGE COPY (key: current text). Return rewrites by key:",
+    copyList,
   ].join("\n");
   let lastReason = "";
-  // Two attempts: the second cooler and with a reminder about valid JSON.
+  const rewritesPromise = (async () => {
+    for (const attempt of [0, 1]) {
+      try {
+        const out = await ollamaText({
+          system: REWRITE_SYSTEM + "\n\nDOSSIER:\n" + SYSTEM,
+          user,
+          temperature: attempt === 0 ? 0.95 : 0.75,
+          numPredict: ctx.band >= 3 ? 4000 : 1500,
+          timeoutMs: 55000,
+        });
+        const parsed = parseRewriteLines(out.text, copy, ctx.band);
+        if (Object.keys(parsed).length > 0) return parsed;
+      } catch (err) {
+        console.error("[whisper] rewrites attempt " + attempt + " failed:", err instanceof Error ? err.message : err);
+      }
+    }
+    return {} as Record<string, string>;
+  })();
   for (const attempt of [0, 1]) {
     try {
       const out = await ollamaJson({
         system: attempt === 0 ? SYSTEM : SYSTEM + "\n\nYour previous reply was not valid JSON. Escape every double quote inside strings and keep strings short.",
-        user,
+        user: user + "\n\n(Rewrites are being written separately; you may leave \"rewrites\" empty.)",
         schema: SCHEMA,
-        temperature: attempt === 0 ? 0.9 : 0.6,
+        temperature: attempt === 0 ? 0.95 : 0.7,
         numPredict: 2600,
-        timeoutMs: 50000,
+        timeoutMs: 55000,
       });
-      const w = normalize(out.json, ctx);
+      const w = normalize(out.json, ctx, copy);
       if (!w) {
         lastReason = "reply failed validation";
         continue;
       }
-      const want = [1, 3, 6, 14][ctx.band - 1] ?? 1;
-      const fb = fallback(ctx).rewrites;
-      for (const [k, v] of Object.entries(fb)) {
-        if (Object.keys(w.rewrites).length >= want) break;
-        if (!w.rewrites[k]) w.rewrites[k] = v;
-      }
-      void kvSet(key, w);
+      const lines = await rewritesPromise;
+      w.rewrites = { ...w.rewrites, ...lines };
+      if (Object.keys(w.rewrites).length === 0) w.rewrites = Object.fromEntries(Object.entries(fallback(ctx).rewrites).filter(([k]) => copy[k] !== undefined));
+      void kvSet(bandCacheKey(ctx.band), w);
       return { whisper: w, source: "model" };
     } catch (err) {
       lastReason = err instanceof Error ? err.message : String(err);
       console.error("[whisper] attempt " + attempt + " failed:", lastReason);
     }
   }
-  return { whisper: fallback(ctx), source: "fallback", reason: lastReason.slice(0, 200) };
+  return fromCache(lastReason.slice(0, 200));
 }

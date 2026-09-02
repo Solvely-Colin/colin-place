@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { fetchGithubActivity } from "../../lib/activity";
 import { clientIp, overLimit } from "../../lib/ollama";
-import { whisper, type VisitorContext } from "../../lib/wrongness";
+import { whisper, type Copy, type VisitorContext } from "../../lib/wrongness";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
@@ -34,8 +34,21 @@ export async function POST(req: NextRequest) {
   };
   // The model runs at most a handful of times per visitor per day; after that
   // the cache and the hand-written fallback carry the effect.
-  const allowModel = !overLimit("whisper", clientIp(req), 12, 800);
+  const copy: Copy = {};
+  if (body.copy && typeof body.copy === "object") {
+    let total = 0;
+    for (const [k, v] of Object.entries(body.copy as Record<string, unknown>)) {
+      if (typeof v !== "string" || !/^[a-z0-9-]{1,40}$/.test(k)) continue;
+      const text = v.replace(/\s+/g, " ").trim().slice(0, 400);
+      if (!text) continue;
+      total += text.length;
+      if (total > 9000 || Object.keys(copy).length >= 90) break;
+      copy[k] = text;
+    }
+  }
+  const nonce = typeof body.nonce === "string" ? body.nonce.slice(0, 24) : Math.random().toString(36).slice(2, 10);
+  const allowModel = !overLimit("whisper", clientIp(req), 16, 900);
   const events = await fetchGithubActivity();
-  const result = await whisper(ctx, events, allowModel);
+  const result = await whisper(ctx, copy, events, allowModel, nonce);
   return NextResponse.json(result, { headers: { "Cache-Control": "no-store" } });
 }
