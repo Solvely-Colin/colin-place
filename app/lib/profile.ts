@@ -28,9 +28,9 @@ export const NOW_ITEMS = [
       "HubSpot architecture, custom apps, and lifecycle automation across four franchise brands.",
   },
   {
-    title: "Exploring developer-relations and ecosystem roles",
-    detail: "If that is you, the contact section is at the bottom of this page.",
-    href: "#contact",
+    title: "Building the Town",
+    detail: "Describe a building and the architect builds it on the next empty lot. New ideas go there first.",
+    href: "/town",
   },
 ];
 
@@ -171,9 +171,9 @@ export const JOURNEY: JourneyStop[] = [
   },
   {
     when: "Now",
-    title: "Looking for the next loop",
-    org: "DevRel & developer ecosystems",
-    note: "Communities, contributors, docs, demos, and the receipts to back them up.",
+    title: "Building a playground",
+    org: "colin.place",
+    note: "Ideas get built here first: the town, an About the site writes itself, whatever is next.",
   },
 ];
 

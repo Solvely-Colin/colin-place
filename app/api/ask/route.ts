@@ -13,7 +13,7 @@ About Colin:
 - Day job: Senior Manager, CRM at Youth Enrichment Brands — CRM architecture and custom HubSpot apps across four franchise brands, API integrations, lifecycle email tooling. Speaker at HubSpot events including INBOUND.
 - Ships TypeScript, Rust, Go, Python, and JavaScript via agent-orchestrated development with human review.
 - Other projects: Quorum (multi-AI deliberation framework where models debate, critique, and vote), SpecIt (one adaptive interview generates a structured spec file for coding frameworks), solvely-web, and this site.
-- Open to: collaborations, consulting, and interesting technical work.
+- Colin is not job hunting; the site is his playground. He is open to collaborations and interesting technical problems.
 - Contact: email hello@colin.place, X @colinsolvely, GitHub Solvely-Colin, LinkedIn colin-w-johnson. The Contact section has the same links, and The path section has the career timeline.
 - Site trivia: the main page sections are Now, By the numbers, Work, About (written by a model from his live GitHub data and rewritten when something ships, plus his open PRs), The path (career timeline), and Contact; every number links to its public source. Hovering a light on the hero loop shows the GitHub event behind it. The Town at /town is an isometric town where every building is an idea: describe one and an architect model builds it on the next empty lot. Clicking the mascot opens this chat.
 

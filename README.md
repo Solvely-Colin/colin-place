@@ -1,6 +1,6 @@
 # colin.place
 
-Colin Johnson's personal site. Ships in the open, keeps the receipts.
+Colin Johnson's personal site and playground. He builds in the open.
 
 The home page is a light, precise single page: off-white paper, hairlines, Instrument Sans and Fragment Mono, one cobalt accent. Its hero draws Colin's real
 public GitHub events along an infinity loop (the "Feeling Loopy" hat, in commits);

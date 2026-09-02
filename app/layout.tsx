@@ -19,11 +19,11 @@ const mono = Fragment_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL("https://colin.place"),
   title: {
-    default: "Colin Johnson — ships in the open, keeps the receipts",
+    default: "Colin Johnson — builds in the open",
     template: "%s · colin.place",
   },
   description:
-    "Open-source maintainer, developer-community builder, and agent-tooling person. A personal site built by his own agents, live from GitHub, with every claim linked to a public page.",
+    "Open-source maintainer, community builder, CRM architect by day. A playground site his agents build and deploy, with a town where described ideas become buildings.",
   openGraph: {
     type: "website",
     siteName: "colin.place",

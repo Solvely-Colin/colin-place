@@ -74,7 +74,7 @@ const SCHEMA = {
       items: { type: "string" },
       minItems: 3,
       maxItems: 4,
-      description: "3-4 paragraphs of 60-110 words: what he works on, what he shipped recently, what he is shepherding, what he is looking for.",
+      description: "3-4 paragraphs of 60-110 words: what he works on, what he shipped recently, what he is shepherding, what he is building for fun.",
     },
     highlights: {
       type: "array",
@@ -103,6 +103,7 @@ Rules:
 - Every highlight must use a URL copied exactly from the data.
 - Keep the fixed facts consistent: volunteer maintainer at OpenClaw; community admin and maintainer on GSD then Open GSD; Senior Manager, CRM at Youth Enrichment Brands; runs experiments under Solvely; based in Mishawaka, Indiana.
 - Mention that this site is planned, written, and deployed by his own agents, and that this About was written by a model from live data.
+- He is not job hunting. Never say he is open to, exploring, or looking for roles, and never address recruiters or hiring managers.
 - Safe for a general audience. Nothing private.`;
 
 function context(input: AboutInputs, previous: AboutRecord | null): string {

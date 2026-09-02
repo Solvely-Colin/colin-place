@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og";
 import { lemniscatePath } from "./lib/loop";
 
-export const alt = "Colin Johnson — ships in the open, keeps the receipts";
+export const alt = "Colin Johnson — builds in the open";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -35,10 +35,10 @@ export default function Image() {
           Colin Johnson · Mishawaka, IN · colin.place
         </div>
         <div style={{ display: "flex", fontSize: 96, fontWeight: 600, letterSpacing: -4, lineHeight: 1, marginTop: 18 }}>
-          Ships in the open.
+          Hi, I'm Colin.
         </div>
         <div style={{ display: "flex", fontSize: 96, fontWeight: 600, letterSpacing: -4, lineHeight: 1, marginTop: 6 }}>
-          Keeps the receipts.
+          I build in the open.
         </div>
       </div>
     ),

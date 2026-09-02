@@ -30,7 +30,7 @@ export const revalidate = 600;
 
 export const metadata: Metadata = {
   description:
-    "Colin Johnson: open-source maintainer at OpenClaw, admin on the 64k-star GSD project, CRM architect for four brands. A site built by his own agents, live from GitHub, with receipts.",
+    "Colin Johnson builds in the open: open-source maintainer, community builder, CRM architect by day. A playground site his agents build and deploy, with a town where described ideas become buildings.",
 };
 
 const LANG_COLORS: Record<string, string> = {
@@ -118,40 +118,41 @@ export default async function Home() {
                 <span>·</span>
                 <span>Mishawaka, Indiana</span>
                 <span>·</span>
-                <span className="text-loop">open to DevRel &amp; ecosystem roles</span>
+                <span className="text-loop flex items-center gap-2"><span className="live-dot" /> live</span>
               </p>
             </Reveal>
 
             <Reveal delay={0.08}>
               <h1 className="display text-[clamp(2.8rem,8vw,7rem)] text-ink">
-                Ships in the open.
+                Hi, I&apos;m Colin.
                 <br />
-                Keeps the receipts.
+                I build in the open.
               </h1>
             </Reveal>
 
             <div className="grid lg:grid-cols-[minmax(0,1fr)_auto] items-end gap-8 mt-10">
               <Reveal delay={0.16}>
                 <p className="pointer-events-auto max-w-[48ch] text-ink-dim text-base sm:text-lg leading-relaxed">
-                  Volunteer maintainer at OpenClaw, admin on the 64k-star GSD project, and the CRM
-                  architect behind four franchise brands. This site is planned, written, and
-                  deployed by his own agents, live from GitHub, and every claim on it links to a
-                  public page.
+                  I maintain open-source tools, help run a couple of developer communities, and
+                  build CRM systems by day. This site is my playground: my agents plan, write, and
+                  deploy it, and the town is where new ideas get built first. Everything here links
+                  to something real.
                 </p>
               </Reveal>
               <Reveal delay={0.24} className="pointer-events-auto flex flex-wrap gap-3">
-                <a
-                  href="#about"
+                <Link
+                  href="/town"
                   className="group inline-flex items-center gap-2 h-10 px-4 rounded-md bg-ink text-ground font-medium text-sm hover:bg-ink-dim transition"
                 >
-                  Read the about
-                  <ArrowDown className="w-4 h-4 transition-transform group-hover:translate-y-0.5" />
-                </a>
+                  <Building2 className="w-4 h-4" />
+                  Walk the town
+                </Link>
                 <a
-                  href="#contact"
-                  className="inline-flex items-center gap-2 h-10 px-4 rounded-md border border-line-strong bg-ground-2 text-ink text-sm font-medium hover:border-ink transition"
+                  href="#about"
+                  className="group inline-flex items-center gap-2 h-10 px-4 rounded-md border border-line-strong bg-ground-2 text-ink text-sm font-medium hover:border-ink transition"
                 >
-                  Say hi
+                  About me
+                  <ArrowDown className="w-4 h-4 transition-transform group-hover:translate-y-0.5" />
                 </a>
               </Reveal>
             </div>
@@ -544,8 +545,8 @@ export default async function Home() {
                 hello@colin.place
               </a>
               <p className="text-ink-dim mt-4 max-w-xl leading-relaxed">
-                Developer-relations and ecosystem roles, collaborations, consulting, and interesting
-                technical work. He reads everything.
+                Open-source, collaborations, interesting technical problems, or just to say hi.
+                He reads everything.
               </p>
             </Reveal>
 
