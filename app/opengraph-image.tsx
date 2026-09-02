@@ -35,7 +35,7 @@ export default function Image() {
           Colin Johnson · Mishawaka, IN · colin.place
         </div>
         <div style={{ display: "flex", fontSize: 96, fontWeight: 600, letterSpacing: -4, lineHeight: 1, marginTop: 18 }}>
-          Hi, I'm Colin.
+          Hi, I&apos;m Colin.
         </div>
         <div style={{ display: "flex", fontSize: 96, fontWeight: 600, letterSpacing: -4, lineHeight: 1, marginTop: 6 }}>
           I build in the open.
