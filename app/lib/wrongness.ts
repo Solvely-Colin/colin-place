@@ -392,7 +392,7 @@ function normalize(raw: unknown, ctx: VisitorContext): Whisper | null {
 }
 
 export function cacheKey(ctx: VisitorContext): string {
-  return ["whisper", ctx.band, ctx.time, ctx.scroll, ctx.hour, ctx.visits, ctx.hovered > 0 ? "h" : "n", ctx.idle ? "i" : "m"].join(":");
+  return ["whisper", "v3", ctx.band, ctx.time, ctx.scroll, ctx.hour, ctx.visits, ctx.hovered > 0 ? "h" : "n", ctx.idle ? "i" : "m"].join(":");
 }
 
 export async function whisper(ctx: VisitorContext, events: FeedItem[], allowModel: boolean): Promise<{ whisper: Whisper; source: "model" | "cache" | "fallback"; reason?: string }> {
