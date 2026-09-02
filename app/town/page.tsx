@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Town } from "./Town";
 import { SEED_BUILDINGS } from "../lib/town/seed";
 import { listBuildings, storeConfigured } from "../lib/town/store";
-import { DEFAULT_MODEL } from "../lib/town/generate";
+import { modelName, ollamaReady } from "../lib/ollama";
 
 export const dynamic = "force-dynamic";
 
@@ -20,8 +20,8 @@ export default async function TownPage() {
       seeds={SEED_BUILDINGS}
       approved={approved}
       storeConfigured={configured}
-      modelName={process.env.OLLAMA_MODEL || DEFAULT_MODEL}
-      modelReady={Boolean(process.env.OLLAMA_API_KEY)}
+      modelName={modelName()}
+      modelReady={ollamaReady()}
     />
   );
 }

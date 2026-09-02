@@ -3,7 +3,7 @@ import type { PulseData } from "./pulse";
 import type { ReposPayload } from "./repos";
 import { ABOUT_FALLBACK, BIG_NUMBERS, ECOSYSTEMS, JOURNEY, NOW_ITEMS } from "./profile";
 import { kvConfigured, kvGet, kvSet } from "./kv";
-import { DEFAULT_MODEL } from "./town/generate";
+import { ollamaJson, ollamaReady } from "./ollama";
 
 // The About section writes itself. A model reads Colin's live public signals
 // and produces a third-person narrative with links to real events. The text
@@ -170,37 +170,19 @@ function normalize(raw: unknown, input: AboutInputs): AboutNarrative | null {
 }
 
 async function callModel(input: AboutInputs, previous: AboutRecord | null): Promise<{ narrative: AboutNarrative; model: string } | null> {
-  const apiKey = process.env.OLLAMA_API_KEY;
-  if (!apiKey) return null;
-  const model = process.env.OLLAMA_MODEL || DEFAULT_MODEL;
+  if (!ollamaReady()) return null;
   try {
-    const res = await fetch("https://ollama.com/api/chat", {
-      method: "POST",
-      headers: { Authorization: "Bearer " + apiKey, "Content-Type": "application/json" },
-      body: JSON.stringify({
-        model,
-        stream: false,
-        think: false,
-        format: SCHEMA,
-        keep_alive: "10m",
-        options: { temperature: 0.6, num_predict: 1600 },
-        messages: [
-          { role: "system", content: SYSTEM },
-          { role: "user", content: "Write the About section from this data.\n\n" + context(input, previous) },
-        ],
-      }),
-      signal: AbortSignal.timeout(GENERATE_TIMEOUT_MS),
+    const out = await ollamaJson({
+      system: SYSTEM,
+      user: "Write the About section from this data.\n\n" + context(input, previous),
+      schema: SCHEMA,
+      temperature: 0.6,
+      numPredict: 1800,
+      timeoutMs: GENERATE_TIMEOUT_MS,
     });
-    if (!res.ok) throw new Error("ollama " + res.status);
-    const data = (await res.json()) as { message?: { content?: string }; error?: string };
-    if (data.error) throw new Error(data.error);
-    const content = data.message?.content ?? "";
-    const start = content.indexOf("{");
-    const end = content.lastIndexOf("}");
-    if (start < 0 || end < 0) throw new Error("no JSON");
-    const narrative = normalize(JSON.parse(content.slice(start, end + 1)), input);
+    const narrative = normalize(out.json, input);
     if (!narrative) throw new Error("narrative failed validation");
-    return { narrative, model };
+    return { narrative, model: out.model };
   } catch (err) {
     console.error("[about] generation failed:", err instanceof Error ? err.message : err);
     return null;
