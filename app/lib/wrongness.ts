@@ -1,4 +1,7 @@
 import type { FeedItem } from "./activity";
+import { fetchPulse } from "./pulse";
+import { AGENT_LOG } from "./agentlog";
+import { BIG_NUMBERS } from "./profile";
 import { kvGet, kvSet } from "./kv";
 import { ollamaJson, ollamaReady, ollamaText } from "./ollama";
 
@@ -81,6 +84,50 @@ export interface Whisper {
   scene?: Scene;
   document?: FoundDocument;
   portrait?: Portrait;
+  /** Lines that run on the wire under the real ticker, built from real events. */
+  omens?: string[];
+}
+
+interface Commit {
+  repo: string;
+  message: string;
+  date: string;
+}
+
+const GH = { Accept: "application/vnd.github+json", "User-Agent": "colin-place" };
+
+// The scene: everything real the story may use. Commit messages are the
+// best material there is, so they are fetched for the repos pushed to
+// this week.
+export async function sceneData(events: FeedItem[]): Promise<string> {
+  const pulse = await fetchPulse();
+  const repos = pulse.shepherding.slice(0, 3);
+  const commits: Commit[] = [];
+  await Promise.all(
+    repos.map(async (r) => {
+      try {
+        const res = await fetch(`https://api.github.com/repos/${r.name}/commits?author=Solvely-Colin&per_page=6`, { headers: GH, next: { revalidate: 900 } });
+        if (!res.ok) return;
+        const list = (await res.json()) as { commit: { message: string; author?: { date?: string } } }[];
+        for (const c of list) commits.push({ repo: r.name, message: c.commit.message.split("\n")[0].slice(0, 110), date: (c.commit.author?.date ?? "").slice(0, 16).replace("T", " ") });
+      } catch {
+        // skip
+      }
+    })
+  );
+  const lines: string[] = [];
+  lines.push(`LIVE NUMBERS (as of ${pulse.generatedAt.slice(0, 16).replace("T", " ")} UTC): ${pulse.pushes7d} pushes in 7 days, ${pulse.pushes30d} in 30, ${pulse.openPrs.length} open pull requests; languages ${pulse.languages.map((l) => l.name + " " + l.share + "%").join(", ") || "n/a"}.`);
+  lines.push("FIXED NUMBERS ON THE PAGE: " + BIG_NUMBERS.map((n) => `${n.value}${n.suffix ?? ""} ${n.label}`).join("; "));
+  lines.push("REPOS PUSHED TO THIS WEEK: " + (repos.map((r) => `${r.name} (last ${r.pushedAt.slice(0, 16).replace("T", " ")} UTC)`).join("; ") || "none"));
+  lines.push("OPEN PULL REQUESTS (real):");
+  for (const pr of pulse.openPrs.slice(0, 8)) lines.push(`- ${pr.repo} #${pr.number}${pr.draft ? " (draft)" : ""}: ${pr.title} (updated ${pr.updatedAt.slice(0, 16).replace("T", " ")} UTC)`);
+  lines.push("RECENT COMMIT MESSAGES (real, newest first):");
+  for (const c of commits.sort((a, b) => b.date.localeCompare(a.date)).slice(0, 12)) lines.push(`- ${c.date} UTC ${c.repo}: ${c.message}`);
+  lines.push("RECENT PUBLIC EVENTS (newest first):");
+  for (const e of events.slice(0, 14)) lines.push(`- ${e.at.replace("T", " ").slice(0, 16)} UTC: ${e.text}`);
+  lines.push("THE SITE'S OWN CHANGELOG, written by the agents that deploy it (newest first):");
+  for (const a of AGENT_LOG.slice(0, 5)) lines.push(`- ${a.date}: "${a.title}". ${a.detail.slice(0, 160)}`);
+  return lines.join("\n");
 }
 
 /** Copy the client offers for rewriting: key -> current text. */
@@ -98,6 +145,13 @@ const SCHEMA = {
     title: { type: "string", description: "the browser tab title, max 40 chars" },
     watcher: { type: "string", description: "one line the figure in the corner says, max 120 chars" },
     last: { type: "string", description: "band 4 only: one calm sentence shown alone on the screen, max 160 chars" },
+    omens: {
+      type: "array",
+      items: { type: "string" },
+      minItems: 2,
+      maxItems: 5,
+      description: "lines that run on the wire under the real ticker, each built from one real event, PR, or commit, 6-18 words, e.g. 'pushed to openclaw/openclaw at 01:02 · nobody was awake · it merged itself'",
+    },
     portrait: {
       type: "object",
       description: "bands 2-4: how the photograph of Colin is treated",
@@ -183,8 +237,13 @@ function parseRewriteLines(text: string, copy: Copy, band: number): Record<strin
     if (original === undefined || !value || key.endsWith("-name")) continue;
     const isStat = key.startsWith("stat-") || key.startsWith("num-");
     if (isStat && band < 3 && /value/.test(key)) continue;
-    const maxLen = isStat && /value/.test(key) ? 14 : Math.max(24, original.length * (band >= 3 ? 1.9 : 1.5) + 12);
-    if (value.length > maxLen) value = value.slice(0, maxLen);
+    const maxLen = isStat && /value/.test(key) ? 14 : Math.max(48, original.length * (band >= 3 ? 1.9 : 1.5) + 12);
+    if (value.length > maxLen) {
+      // Trim at a word boundary; a sentence cut mid-word reads as a bug, not a haunting.
+      const cut = value.slice(0, maxLen);
+      const at = Math.max(cut.lastIndexOf(" "), cut.lastIndexOf("."), cut.lastIndexOf(","));
+      value = (at > maxLen * 0.5 ? cut.slice(0, at) : cut).replace(/[,;:—-]+$/, "").trim();
+    }
     if (!isStat && value.length < Math.min(original.length * 0.5, 12)) continue;
     out[key] = value;
   }
@@ -199,6 +258,8 @@ DOSSIER (public-domain texts; quote them sparingly and exactly when you do):
 - Band 3, The Dreams in the Witch House and R'lyeh: "a violet mist showing the convergence of angled planes"; "the curious angles of the room"; "lines and curves that could be made to point out directions leading through the walls of space"; scratching in the walls, "furtive but deliberate", with "a sort of dry rattling"; the rat with a human face. R'lyeh: "abnormal, non-Euclidean"; angles that behave wrong; a door that opens the wrong way. From The Statement of Randolph Carter, a voice on the wire from below: "YOU FOOL, WARREN IS DEAD!" Stage: geometry stops agreeing with itself. Rename the section titles as parts of a case, roman numerals, like "I. The Horror in the Loop", "II. The Tale of the Open Pull Requests", "III. The Madness from the Sea". A document: an inspector's statement or an affidavit about this site, its dates taken from the real GitHub events.
 - Band 4, The Shadow over Innsmouth and The Haunter of the Dark: Devil Reef, "a long, black line scarcely rising above the water"; the Innsmouth look, "bulgy, stary eyes that never seem to shut"; the Esoteric Order of Dagon; the trade with the sea; the narrator finds the look in his own face and goes willingly: "we shall swim out to that brooding reef". The Haunter: a stone that is "a window on all time and space"; the thing can only move in the dark; the blackout at 2:12; the diary that degenerates: "I see it—coming here—hell-wind—titan blur—black wings—Yog-Sothoth save me—the three-lobed burning eye". Stage: the tide comes up the page, the lights go out on a schedule, the reader is being recognised as one of them. The copy degenerates into Blake's fragments, em-dashes, half sentences, but the facts inside stay true. A document: the last diary, stopping mid-line.
 - The door, sanity zero: "That is not dead which can eternal lie, And with strange aeons even death may die." Calm. The reader is offered the door.
+
+THE SITE IS THE SCENE. Everything happens in the page's own rooms, and you name them: the loop (the ∞ of lights at the top, each light a real event), the wire (the ticker of pushes and pull requests), the numbers (the counted stats), the photograph (Colin in the cap that says Feeling Loopy), the cards, the path (his career, stop by stop), the footer, and the corner where the small figure stands. The real record is your evidence: quote pull requests by number and title, commit messages verbatim as things found written on walls or in logs, push times as the hours things happened, the site's own changelog as its diary. A commit message like "fix(ios): preserve structured follow-ups across queued delivery" is a line scratched into the wall of the tower; PR #135362 still open is a door that has not shut. Use them constantly. Every band's document should cite at least three real items with their real numbers, times, or wording.
 
 Register: quiet, plain, reverent, wrong. Never gore, never threats, never exclamation marks except the Warren line. The page is a very old building that is glad you came.
 
@@ -461,7 +522,8 @@ function normalize(raw: unknown, ctx: VisitorContext, copy: Copy): Whisper | nul
   const scene = ctx.band >= 2 ? normalizeScene(r.scene, ctx.band) : undefined;
   const document = normalizeDocument(r.document, ctx.band);
   const portrait = normalizePortrait(r.portrait, ctx.band);
-  return { marginalia, rewrites, title, watcher, ...(last ? { last } : {}), ...(scene ? { scene } : {}), document, ...(portrait ? { portrait } : {}) };
+  const omens = Array.isArray(r.omens) ? r.omens.map((o) => clean(o, 140)).filter(Boolean).slice(0, 5) : [];
+  return { marginalia, rewrites, title, watcher, ...(last ? { last } : {}), ...(scene ? { scene } : {}), document, ...(portrait ? { portrait } : {}), omens };
 }
 
 function bandCacheKey(band: number): string {
@@ -485,7 +547,7 @@ export async function whisper(
     return { whisper: fallback(ctx), source: "fallback" as const, reason };
   };
   if (!allowModel || !ollamaReady()) return fromCache(!ollamaReady() ? "no key" : "rate limited");
-  const omens = events.slice(0, 14).map((e) => `- ${e.at.replace("T", " ").slice(0, 16)} UTC: ${e.text}`).join("\n");
+  const scene = await sceneData(events);
   const copyList = Object.entries(copy)
     .map(([k, v]) => `${k}: ${v}`)
     .join("\n");
@@ -493,8 +555,8 @@ export async function whisper(
     `BAND: ${ctx.band} of 4`,
     `NONCE: ${nonce}`,
     `VISITOR: has been here ${ctx.time}; is near ${ctx.scroll} of the page; it is ${ctx.hour} for them; this is their ${ctx.visits} visit; hovered the loop ${ctx.hovered > 0 ? "yes" : "no"}; went still ${ctx.idle ? "yes" : "no"}.`,
-    "REAL GITHUB EVENTS (newest first):",
-    omens || "- none",
+    "THE SCENE (all real):",
+    scene,
     "PAGE COPY (key: current text). Return rewrites by key:",
     copyList,
   ].join("\n");

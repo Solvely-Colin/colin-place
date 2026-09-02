@@ -43,6 +43,7 @@ interface Whisper {
   scene?: Scene;
   document?: FoundDocument;
   portrait?: { treatment: Treatment; strength: number; caption: string };
+  omens?: string[];
 }
 interface Note {
   id: number;
@@ -247,6 +248,7 @@ export function Wrongness({ ready }: { ready: boolean }) {
     for (const v of Array.from(root.style)) if (v.startsWith("--color-") || v.startsWith("--wr-")) root.style.removeProperty(v);
     drone.current?.stop();
     e.portrait?.set(null, 0);
+    document.getElementById("omen-strip")?.remove();
     setSound(false);
     setBand(0);
     setNotes([]);
@@ -377,6 +379,21 @@ export function Wrongness({ ready }: { ready: boolean }) {
         }, 9000);
       }
       if (b >= 3) shuffleNav();
+      if (w.omens && w.omens.length > 0 && b >= 2) {
+        // A second line on the wire, from below.
+        let strip = document.getElementById("omen-strip");
+        const track = document.querySelector(".marquee-track");
+        if (!strip && track) {
+          strip = document.createElement("div");
+          strip.id = "omen-strip";
+          strip.className = "marquee-track relative border-t border-line overflow-hidden";
+          track.insertAdjacentElement("afterend", strip);
+        }
+        if (strip) {
+          const items = w.omens.map((o) => `<span class="px-6 whitespace-nowrap">${o.replace(/[<>&]/g, "")}</span>`).join('<span class="text-loop">·</span>');
+          strip.innerHTML = `<div class="marquee py-2.5 font-mono text-[12px] text-loop" style="--marquee-duration: ${Math.max(30, w.omens.length * 12)}s"><div class="flex shrink-0"><span class="px-6 uppercase tracking-[0.18em] text-[11px]">from below</span>${items}</div><div class="flex shrink-0" aria-hidden="true"><span class="px-6 uppercase tracking-[0.18em] text-[11px]">from below</span>${items}</div></div>`;
+        }
+      }
       if (w.portrait && e.portrait) {
         e.portrait.set({ treatment: w.portrait.treatment, strength: w.portrait.strength }, b === 2 ? 0.55 : b === 3 ? 0.8 : 1);
         if (w.portrait.caption) w.rewrites["portrait-caption"] = w.portrait.caption;
@@ -445,7 +462,8 @@ export function Wrongness({ ready }: { ready: boolean }) {
       if (e.doorsClosed > 0) decay *= 0.6;
       const hovers = window.__wrongness?.hovers ?? 0;
       if (hovers > e.hovers) {
-        decay += (hovers - e.hovers) * 1.5;
+        // Playing with the lights costs a little, up to a point.
+        if (e.hovers < 12) decay += Math.min(3, (hovers - e.hovers) * 1.2);
         e.hovers = hovers;
       }
       for (const m of [25, 50, 75, 99]) {
