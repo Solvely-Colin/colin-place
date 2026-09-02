@@ -51,6 +51,9 @@ door and everything is restored. `?sanity=30` previews a band. "The site feels f
 
 ## Working on it
 
+The repo is github.com/Solvely-Colin/colin-place. Pushes to `main` deploy to
+colin.place through Vercel's GitHub integration.
+
 ```bash
 npm install
 npm run dev
