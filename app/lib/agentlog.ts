@@ -10,6 +10,12 @@ export interface AgentLogEntry {
 export const AGENT_LOG: AgentLogEntry[] = [
   {
     date: "2026-09-02",
+    title: "Every building got an inside",
+    detail:
+      "Walking into a building now drops you into a room the architect designed for it: floor and wall colours, four to seven objects you walk up to (a cauldron, a telescope, an aquarium, whatever fits), each with its own note, and a keeper who comes over to greet you. The prose moved to a guidebook.",
+  },
+  {
+    date: "2026-09-02",
     title: "The About writes itself; the OS and the log retired",
     detail:
       "Receipts became About: a model reads Colin's live GitHub signals, writes a third-person narrative with links to real events, and rewrites it only when something new ships. Colin OS and the log pages were removed.",

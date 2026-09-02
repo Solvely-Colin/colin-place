@@ -1,6 +1,7 @@
 import type { Building, BuildingSpec } from "../../lib/town/types";
 import { FLOOR_H, TILE_H, TILE_W, mix, noise, rgba, shade, toScreen, type Vec } from "./iso";
 import { LOT, LOTS, ROAD, lotOrigin, type Placed } from "./world";
+import { COLIN_LOOK, drawFigure } from "./room";
 
 // Everything that touches the canvas. The scene is painted back-to-front
 // (painter's algorithm by grid depth), then a night tint, then lights.
@@ -583,61 +584,7 @@ export function drawConstruction(s: Scene, lotIndex: number, progress: number) {
 // ---------------------------------------------------------------- avatar
 
 export function drawAvatar(s: Scene, x: number, y: number, moving: boolean, facing: number) {
-  const { ctx, t, night } = s;
-  const c = toScreen(x, y);
-  const bob = moving ? Math.abs(Math.sin(t * 9)) * 2.5 : 0;
-  ctx.fillStyle = rgba("#000000", 0.28);
-  ctx.beginPath();
-  ctx.ellipse(c.x, c.y + 1, 9, 4.5, 0, 0, Math.PI * 2);
-  ctx.fill();
-  const y0 = c.y - bob;
-  // Legs
-  ctx.strokeStyle = "#2b2622";
-  ctx.lineWidth = 3;
-  const step = moving ? Math.sin(t * 9) * 3 : 0;
-  ctx.beginPath();
-  ctx.moveTo(c.x - 3, y0 - 8);
-  ctx.lineTo(c.x - 3 + step, y0);
-  ctx.moveTo(c.x + 3, y0 - 8);
-  ctx.lineTo(c.x + 3 - step, y0);
-  ctx.stroke();
-  // Body: black tee
-  ctx.fillStyle = mix("#1f1d1b", "#0e0d0b", night * 0.3);
-  ctx.beginPath();
-  ctx.roundRect(c.x - 7, y0 - 22, 14, 15, 3);
-  ctx.fill();
-  // Head
-  ctx.fillStyle = "#f1c9a5";
-  ctx.beginPath();
-  ctx.arc(c.x, y0 - 28, 6.5, 0, Math.PI * 2);
-  ctx.fill();
-  // Glasses
-  ctx.strokeStyle = "#111";
-  ctx.lineWidth = 1.2;
-  const dir = facing >= 0 ? 1 : -1;
-  ctx.beginPath();
-  ctx.arc(c.x - 2.5 * dir, y0 - 28.5, 2, 0, Math.PI * 2);
-  ctx.arc(c.x + 2.5 * dir, y0 - 28.5, 2, 0, Math.PI * 2);
-  ctx.stroke();
-  // Mustache
-  ctx.strokeStyle = "#a8622d";
-  ctx.lineWidth = 1.6;
-  ctx.beginPath();
-  ctx.moveTo(c.x - 3, y0 - 25.2);
-  ctx.quadraticCurveTo(c.x, y0 - 23.8, c.x + 3, y0 - 25.2);
-  ctx.stroke();
-  // Cap: cream with the orange loop
-  ctx.fillStyle = "#efe6d3";
-  ctx.beginPath();
-  ctx.arc(c.x, y0 - 30, 6.8, Math.PI, Math.PI * 2);
-  ctx.fill();
-  ctx.fillRect(c.x - 7 + (dir < 0 ? -3 : 0), y0 - 30.5, 10 + 3, 2);
-  ctx.strokeStyle = "#ff8c42";
-  ctx.lineWidth = 1.2;
-  ctx.beginPath();
-  ctx.ellipse(c.x - 1.4, y0 - 32.5, 1.5, 1, 0, 0, Math.PI * 2);
-  ctx.ellipse(c.x + 1.4, y0 - 32.5, 1.5, 1, 0, 0, Math.PI * 2);
-  ctx.stroke();
+  drawFigure(s, x, y, moving, facing, COLIN_LOOK);
 }
 
 export function drawTarget(s: Scene, x: number, y: number) {

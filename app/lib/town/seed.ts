@@ -2,6 +2,18 @@ import type { Building } from "./types";
 
 // Colin's own buildings: the ideas that already exist. Lots are assigned in
 // this order along the town's spiral, so the first entries sit at the centre.
+// Who runs each of Colin's buildings. Used to lay out their insides.
+export const SEED_KEEPERS: Record<string, { name: string; greeting: string }> = {
+  "the-loop": { name: "Clippy Colin", greeting: "Hey. Every light out there is a real commit. In here it's just me and the telemetry." },
+  quorum: { name: "The Moderator", greeting: "Three of them are arguing upstairs. Give it a minute; consensus is expensive today." },
+  specit: { name: "The Interviewer", greeting: "Sit anywhere. First question: what are you actually trying to build?" },
+  "gsd-browser": { name: "The Lab Tech", greeting: "Don't touch the evidence bundles. Or do, they're replayable." },
+  openclaw: { name: "The Super", greeting: "Seven floors, every one under renovation. Mind the Slack floor, it's signed." },
+  "clippy-colin": { name: "Clippy", greeting: "Oh! A visitor. I've read every commit. Ask me anything, I have receipts." },
+  "agent-ops": { name: "Night Shift", greeting: "Six of us on duty, zero automatic writes. Colin's asleep. Probably." },
+  "feeling-loopy": { name: "The Hatter", greeting: "Try one on. Everybody looks a little loopy. That's the point." },
+};
+
 export const SEED_BUILDINGS: Building[] = [
   {
     id: "seed-loop",

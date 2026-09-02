@@ -28,8 +28,9 @@ token forces a rewrite. Without `OLLAMA_API_KEY` the hand-written fallback in
 `/town` is a tiny isometric town where every building is an idea. Colin's projects
 are the first lots. Type a description and the architect writes a building spec
 as JSON (name, shape, floors, roof, palette, features, and an interior with rooms
-and a question); the engine draws it, a crane raises it on the next empty lot, and
-you walk in. `?hour=22` previews the town at another time of day.
+and a question) plus a walkable layout (room size, floor and wall colours, objects
+with notes, and a keeper); the engine draws it, a crane raises it on the next empty
+lot, and you walk in to a room you can move around in. Walk out the front to leave. `?hour=22` previews the town at another time of day.
 
 Env vars:
 

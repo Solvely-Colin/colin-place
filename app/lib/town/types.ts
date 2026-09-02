@@ -45,6 +45,54 @@ export interface Interior {
   question: string;
 }
 
+// The walkable inside. Objects are the things you walk up to; the keeper is
+// whoever runs the place.
+export const OBJECT_KINDS = [
+  "desk",
+  "bookshelf",
+  "lamp",
+  "plant",
+  "machine",
+  "sign",
+  "telescope",
+  "counter",
+  "crate",
+  "terminal",
+  "chair",
+  "rug",
+  "fountain",
+  "bed",
+  "easel",
+  "cauldron",
+  "piano",
+  "aquarium",
+  "vending",
+  "globe",
+] as const;
+export type ObjectKind = (typeof OBJECT_KINDS)[number];
+
+export interface RoomObject {
+  kind: ObjectKind;
+  x: number;
+  y: number;
+  label: string;
+  note: string;
+}
+
+export interface Keeper {
+  name: string;
+  greeting: string;
+}
+
+export interface Layout {
+  w: number;
+  d: number;
+  floor: string;
+  wall: string;
+  keeper: Keeper;
+  objects: RoomObject[];
+}
+
 export interface BuildingSpec {
   name: string;
   tagline: string;
@@ -56,6 +104,7 @@ export interface BuildingSpec {
   sign: string;
   features: Feature[];
   interior: Interior;
+  layout?: Layout;
 }
 
 export type BuildingSource = "colin" | "model" | "blueprint";
@@ -123,7 +172,9 @@ export function normalizeSpec(raw: unknown, description: string): BuildingSpec {
     : [];
 
   const name = text(r.name, 28, "Untitled place");
+  const layout = normalizeLayout(r.layout);
   return {
+    ...(layout ? { layout } : {}),
     name,
     tagline: text(r.tagline, 70, description.slice(0, 70)),
     kind: oneOf(r.kind, KINDS, "workshop"),
@@ -143,6 +194,47 @@ export function normalizeSpec(raw: unknown, description: string): BuildingSpec {
       rooms,
       question: text(inter.question, 160, "What would you build next door?"),
     },
+  };
+}
+
+export function normalizeLayout(raw: unknown): Layout | null {
+  if (!raw || typeof raw !== "object") return null;
+  const r = raw as Record<string, unknown>;
+  const w = clampInt(r.w, 5, 9, 7);
+  const d = clampInt(r.d, 5, 9, 7);
+  const kp = (r.keeper && typeof r.keeper === "object" ? r.keeper : {}) as Record<string, unknown>;
+  const objects: RoomObject[] = [];
+  const taken = new Set<string>();
+  if (Array.isArray(r.objects)) {
+    for (const o of r.objects) {
+      const ob = (o && typeof o === "object" ? o : {}) as Record<string, unknown>;
+      const kind = oneOf(ob.kind, OBJECT_KINDS, "crate");
+      let x = clampInt(ob.x, 0, w - 1, 1);
+      let y = clampInt(ob.y, 0, d - 1, 1);
+      // Keep the entrance lane (front centre) clear.
+      const doorX = Math.floor(w / 2);
+      if (y === d - 1 && Math.abs(x - doorX) <= 1) y = d - 2;
+      let tries = 0;
+      while (taken.has(x + "," + y) && tries < 20) {
+        x = (x + 1) % w;
+        if (x === 0) y = Math.max(0, (y + 1) % (d - 1));
+        tries += 1;
+      }
+      taken.add(x + "," + y);
+      const label = text(ob.label, 32);
+      if (!label) continue;
+      objects.push({ kind, x, y, label, note: text(ob.note, 200, "Nothing written here yet.") });
+      if (objects.length >= 7) break;
+    }
+  }
+  if (objects.length < 2) return null;
+  return {
+    w,
+    d,
+    floor: hex(r.floor, "#d9cdb5"),
+    wall: hex(r.wall, "#efe6d3"),
+    keeper: { name: text(kp.name, 24, "The keeper"), greeting: text(kp.greeting, 160, "Welcome in. Have a look around.") },
+    objects,
   };
 }
 
@@ -185,6 +277,41 @@ export const BUILDING_SCHEMA = {
     roof: { type: "string", enum: [...ROOFS] },
     sign: { type: "string", description: "Text on the sign over the door, max 18 chars" },
     features: { type: "array", items: { type: "string", enum: [...FEATURES] }, maxItems: 3 },
+    layout: {
+      type: "object",
+      description: "The walkable inside of the building, as a small isometric room.",
+      properties: {
+        w: { type: "integer", minimum: 5, maximum: 9, description: "room width in tiles" },
+        d: { type: "integer", minimum: 5, maximum: 9, description: "room depth in tiles; the entrance is at the front centre" },
+        floor: { type: "string", description: "hex colour of the floor" },
+        wall: { type: "string", description: "hex colour of the walls" },
+        keeper: {
+          type: "object",
+          properties: {
+            name: { type: "string", description: "who runs the place, max 24 chars, e.g. 'The Lamp Keeper'" },
+            greeting: { type: "string", description: "one spoken line when a visitor walks up, max 160 chars, in character" },
+          },
+          required: ["name", "greeting"],
+        },
+        objects: {
+          type: "array",
+          minItems: 4,
+          maxItems: 7,
+          items: {
+            type: "object",
+            properties: {
+              kind: { type: "string", enum: [...OBJECT_KINDS] },
+              x: { type: "integer", minimum: 0, maximum: 8 },
+              y: { type: "integer", minimum: 0, maximum: 8 },
+              label: { type: "string", description: "what this thing is, max 32 chars" },
+              note: { type: "string", description: "what the visitor reads when they walk up to it, max 200 chars, playful and specific" },
+            },
+            required: ["kind", "x", "y", "label", "note"],
+          },
+        },
+      },
+      required: ["w", "d", "floor", "wall", "keeper", "objects"],
+    },
     interior: {
       type: "object",
       properties: {
@@ -211,5 +338,5 @@ export const BUILDING_SCHEMA = {
       required: ["headline", "body", "rooms", "question"],
     },
   },
-  required: ["name", "tagline", "kind", "floors", "footprint", "palette", "roof", "sign", "features", "interior"],
+  required: ["name", "tagline", "kind", "floors", "footprint", "palette", "roof", "sign", "features", "layout", "interior"],
 } as const;
