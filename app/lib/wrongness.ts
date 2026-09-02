@@ -309,11 +309,11 @@ export function cacheKey(ctx: VisitorContext): string {
   return ["whisper", ctx.band, ctx.time, ctx.scroll, ctx.hour, ctx.visits, ctx.hovered > 0 ? "h" : "n", ctx.idle ? "i" : "m"].join(":");
 }
 
-export async function whisper(ctx: VisitorContext, events: FeedItem[], allowModel: boolean): Promise<{ whisper: Whisper; source: "model" | "cache" | "fallback" }> {
+export async function whisper(ctx: VisitorContext, events: FeedItem[], allowModel: boolean): Promise<{ whisper: Whisper; source: "model" | "cache" | "fallback"; reason?: string }> {
   const key = cacheKey(ctx);
   const cached = await kvGet<Whisper>(key);
   if (cached) return { whisper: cached, source: "cache" };
-  if (!allowModel || !ollamaReady()) return { whisper: fallback(ctx), source: "fallback" };
+  if (!allowModel || !ollamaReady()) return { whisper: fallback(ctx), source: "fallback", reason: !ollamaReady() ? "no key" : "rate limited" };
   try {
     const omens = events.slice(0, 12).map((e) => `- ${e.at.replace("T", " ").slice(0, 16)} UTC: ${e.text}`).join("\n");
     const originals = Object.entries(MUTABLE)
@@ -335,7 +335,7 @@ export async function whisper(ctx: VisitorContext, events: FeedItem[], allowMode
       timeoutMs: 50000,
     });
     const w = normalize(out.json, ctx);
-    if (!w) return { whisper: fallback(ctx), source: "fallback" };
+    if (!w) return { whisper: fallback(ctx), source: "fallback", reason: "reply failed validation" };
     // Models under-deliver rewrites at deep bands; top up from the hand-written set.
     const want = [1, 3, 6, 14][ctx.band - 1] ?? 1;
     const fb = fallback(ctx).rewrites;
@@ -346,7 +346,8 @@ export async function whisper(ctx: VisitorContext, events: FeedItem[], allowMode
     void kvSet(key, w);
     return { whisper: w, source: "model" };
   } catch (err) {
-    console.error("[whisper] failed:", err instanceof Error ? err.message : err);
-    return { whisper: fallback(ctx), source: "fallback" };
+    const reason = err instanceof Error ? err.message : String(err);
+    console.error("[whisper] failed:", reason);
+    return { whisper: fallback(ctx), source: "fallback", reason: reason.slice(0, 200) };
   }
 }
